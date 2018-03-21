@@ -4,8 +4,6 @@
 -- 2. Number of customers
 -- 3. Sales per bucket
 
-SELECT top 10 *
-FROM fld_team10
 
 -- FanJoy
 SELECT orders_count

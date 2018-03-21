@@ -115,3 +115,8 @@ CREATE VIEW kevin_ip.dist_team10 AS
     GROUP BY 1
     ORDER BY 1
   );
+
+
+SELECT *
+FROM kevin_ip.fod_team10
+LIMIT 10;
