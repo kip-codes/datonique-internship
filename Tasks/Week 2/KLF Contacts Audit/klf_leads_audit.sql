@@ -22,7 +22,7 @@ CREATE TABLE kevin_ip.lead_source_report_staging AS (
       END AS "Name"
       , regexp_replace(phone1, '[^0-9]+', '') AS "Phone 1"
       , address_billing_postal_code AS "Postal Code"
-      , date_created AS "DateCreatedPT"
+      , to_char(date_created::timestamp, 'MM/DD/YYYY HH12:MI:SS PM') AS "DateCreatedPT" -- will need to calc for breakdown
       , salesperson AS "Owner" -- Point of Sales contact
       , NULL AS "Leadsource" -- FIXME
       , NULL AS "Lead Source Category" -- FIXME
@@ -32,14 +32,14 @@ CREATE TABLE kevin_ip.lead_source_report_staging AS (
       , NULL AS "Website/Landing Page" -- FIXME
       , NULL AS "Search Engine" -- FIXME
       , NULL AS "Lead ID" -- FIXME
-      , NULL AS "New Lead Source" -- FIXME
+      , newleadsource AS "New Lead Source"
       , id AS "ID"
-      , NULL AS "Date Retained"
-      , NULL AS "Retainer Amount"
-      , NULL AS "Downpay"
-      , NULL AS "Type"
-      , NULL AS "DateCreated"
-      , NULL AS "Time"
+      , date_retained AS "Date Retained"
+      , retainer_amount AS "Retainer Amount"
+      , amount_paid AS "Amount Paid"
+      , to_char(to_date(to_char(date_created::timestamp, 'MM/DD/YYYY HH12:MI:SS PM'), 'MM/DD/YYYY'), 'MM/DD/YYYY')
+          AS "DateCreated" -- unsure if correct var type
+      , to_char(date_created, 'HH12:MI:SS PM') AS "Time" -- unsure if correct var type
       , NULL AS "Hour"
       , NULL AS "Month and Year"
       , NULL AS "Year"
@@ -134,7 +134,11 @@ LIMIT 15;
 
 
 -- "New Lead Source"
--- UNAVAILABLE
+SELECT newleadsource
+FROM klf.contacts
+LIMIT 15;
+-- Returns integer for new lead code
+-- missing strings for website leads
 
 
 -- ID
@@ -144,4 +148,36 @@ LIMIT 15;
 -- Unique identifier per contact
 -- unsure if PK
 
+
+-- Date retained
+SELECT date_retained
+FROM klf.contacts
+LIMIT 15;
+
+
+-- Retainer amount
+SELECT retainer_amount
+FROM klf.contacts
+LIMIT 15;
+
+
+-- Amount Paid
+SELECT amount_paid
+FROM klf.contacts
+LIMIT 15;
+
+
+-- Date Created
+SELECT date_created::timestamp::date
+  , to_char(to_date(to_char(date_created::timestamp, 'MM/DD/YYYY HH12:MI:SS PM'), 'MM/DD/YYYY'), 'MM/DD/YYYY')
+  , to_date(to_char(to_date(to_char(date_created::timestamp, 'MM/DD/YYYY HH12:MI:SS PM'), 'MM/DD/YYYY'), 'MM/DD/YYYY'), 'MM/DD/YYYY'
+)
+FROM klf.contacts
+LIMIT 15;
+
+
+-- Time
+SELECT to_char(date_created, 'HH12:MI:SS PM')
+FROM klf.contacts
+LIMIT 15;
 
