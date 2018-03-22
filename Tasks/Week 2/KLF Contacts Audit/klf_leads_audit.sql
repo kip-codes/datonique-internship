@@ -45,22 +45,24 @@ CREATE TABLE kevin_ip.lead_source_report_staging AS (
             THEN substring(substring(to_char(date_created, 'HH12:MI:SS PM'),1,2),2,1)
           ELSE substring(to_char(date_created, 'HH12:MI:SS PM'),1,2)
         END AS "Hour"
-      , NULL AS "Month and Year"
-      , NULL AS "Year"
-      , NULL AS "Month"
-      , NULL AS "Day"
-      , NULL AS "Week"
-      , NULL AS "Weekday"
-      , NULL AS "County of Arrest"
-      , NULL AS "Court"
+      , EXTRACT(month FROM date_created)::text + ', ' + EXTRACT(year FROM date_created)::text
+          AS "Month and Year"
+      , EXTRACT(YEAR from date_created) AS "Year"
+      , EXTRACT(MONTH from date_created) AS "Month"
+      , EXTRACT(DAY from date_created) AS "Day"
+      , EXTRACT(WEEK from date_created) AS "Week"
+      , EXTRACT(dow from date_created) + 1 AS "Weekday"
+      , county_of_arrest AS "County of Arrest"
+      , court_location AS "Court Location"
       , NULL AS "TimeGroup" -- keep null
-      , NULL AS "Id" -- keep null
       , NULL AS "Shift" -- keep null
-      , NULL AS "Offense"
+      , offense AS "Offense"
       , NULL AS "Spend" -- keep null
-      , NULL AS "Radio/TV/Internet"
-      , NULL AS "What Station of Website"
-
+      , "where_did_you_find_us?" as "Where did you find us"
+      , what_station_or_website AS "What Station of Website"
+      , pnc_info as "PNC Info"
+      , additional_info as "Additional Info"
+      , bird_type AS "Bird Type"
     FROM klf.contacts
     -- Custom date range
     WHERE EXTRACT(year FROM date_created) = 2018 and EXTRACT(month from date_created) = 1
@@ -200,12 +202,92 @@ FROM klf.contacts
 LIMIT 15;
 
 
+-- Time: Month and Year
+SELECT EXTRACT(month FROM date_created)::text + ', ' + EXTRACT(year FROM date_created)::text as "m,y"
+FROM klf.contacts
+LIMIT 15;
+-- Concatenating strings
+
+
+-- Time: Year, month, day
+SELECT date_created
+  , EXTRACT(YEAR from date_created) as year
+  , EXTRACT(MONTH from date_created) as month
+  , EXTRACT(DAY from date_created) as day
+FROM klf.contacts
+LIMIT 15;
+
+
+-- Time: Week
+SELECT date_created
+  , EXTRACT(WEEK from date_created) as week
+FROM klf.contacts
+LIMIT 5;
+
+
+-- Time: Weekday
+SELECT DISTINCT date_created
+  , EXTRACT(dow from date_created) + 1 as weekday
+FROM klf.contacts
+LIMIT 20;
+-- Add 1 to shift range from 0-6 to 1-7, with 1 as Sunday
+
+
+-- "County of Arrest"
+SELECT county_of_arrest
+from klf.contacts
+LIMIT 5;
+
+
+-- "Court Location"
+SELECT court_location
+from klf.contacts
+LIMIT 5;
+
+
+-- "Radio/TV/Internet"
+-- UNAVAILABLE, possible overlap with "Where did you find us?"
+
+
+-- Offense
+SELECT offense
+from klf.contacts
+LIMIT 5;
+
+
+-- "What Station of Website"
+SELECT "what_station_or_website"
+from klf.contacts
+LIMIT 5;
+
+
+-- "where did you find us"
+SELECT "where_did_you_find_us?"
+from klf.contacts
+LIMIT 5;
+
 
 
 
 SELECT SUM(retainer_amount)
 FROM klf.contacts
-WHERE EXTRACT(year FROM date_created) = 2018
+WHERE EXTRACT(year FROM date_created) = 2018;
 
 -- breakdown by month
+SELECT
+  extract(YEAR from date_created) as year
+  , extract(month from date_created) as month
+  , SUM(retainer_amount) as total_retainer_amount
+FROM klf.contacts
+WHERE extract(YEAR from date_created) >= 2016
+GROUP BY extract(YEAR from date_created), EXTRACT(MONTH FROM date_created)
+ORDER BY year, month;
+
+
 -- do the same for 2016, 2017
+SELECT
+  EXTRACT(year from date_created) as year
+  , SUM(retainer_amount) as total_retainer_amount
+FROM klf.contacts
+WHERE EXTRACT(year from date_created) >= 2016
+GROUP BY EXTRACT(year FROM date_created);
