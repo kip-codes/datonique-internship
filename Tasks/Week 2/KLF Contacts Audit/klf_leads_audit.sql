@@ -40,7 +40,11 @@ CREATE TABLE kevin_ip.lead_source_report_staging AS (
       , to_char(to_date(to_char(date_created::timestamp, 'MM/DD/YYYY HH12:MI:SS PM'), 'MM/DD/YYYY'), 'MM/DD/YYYY')
           AS "DateCreated" -- unsure if correct var type
       , to_char(date_created, 'HH12:MI:SS PM') AS "Time" -- unsure if correct var type
-      , NULL AS "Hour"
+      , CASE
+          WHEN substring(substring(to_char(date_created, 'HH12:MI:SS PM'),1,2),1,1) = '0'
+            THEN substring(substring(to_char(date_created, 'HH12:MI:SS PM'),1,2),2,1)
+          ELSE substring(to_char(date_created, 'HH12:MI:SS PM'),1,2)
+        END AS "Hour"
       , NULL AS "Month and Year"
       , NULL AS "Year"
       , NULL AS "Month"
@@ -92,6 +96,8 @@ LIMIT 50;
 -- Date created PT
 SELECT
   date_created
+  , to_char(date_created::timestamp, 'MM/DD/YYYY HH12:MI:SS PM') AS "DateCreatedPT" -- will need to calc for breakdown
+  , to_timestamp(to_char(date_created::timestamp, 'MM/DD/YYYY HH12:MI:SS PM'), 'MM/DD/YYYY HH12:MI:SS PM') AS "DateCreatedPT" -- will need to calc for breakdown
 FROM klf.contacts
 LIMIT 15;
 -- accept raw timestamp
@@ -174,10 +180,32 @@ SELECT date_created::timestamp::date
 )
 FROM klf.contacts
 LIMIT 15;
-
+-- Casted to format similarly to the spreadsheet with slashes instead of dashes.
 
 -- Time
 SELECT to_char(date_created, 'HH12:MI:SS PM')
 FROM klf.contacts
 LIMIT 15;
 
+
+-- Time: hour
+SELECT to_char(date_created, 'HH12:MI:SS PM'),
+  substring(to_char(date_created, 'HH12:MI:SS PM'),1,2),
+  CASE
+    WHEN substring(substring(to_char(date_created, 'HH12:MI:SS PM'),1,2),1,1) = '0'
+      THEN substring(substring(to_char(date_created, 'HH12:MI:SS PM'),1,2),2,1)
+    ELSE substring(to_char(date_created, 'HH12:MI:SS PM'),1,2)
+  END AS hour
+FROM klf.contacts
+LIMIT 15;
+
+
+
+
+
+SELECT SUM(retainer_amount)
+FROM klf.contacts
+WHERE EXTRACT(year FROM date_created) = 2018
+
+-- breakdown by month
+-- do the same for 2016, 2017
