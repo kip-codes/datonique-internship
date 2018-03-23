@@ -29,7 +29,7 @@ CREATE TABLE kevin_ip.lead_source_report_staging AS (
       , lead_mode AS "Lead Mode"
       , NULL AS "Search Engine Referrer" -- FIXME
       , "source_/_website" AS "Source / Website"
-      , NULL AS "Website/Landing Page" -- FIXME
+      , "website/landing_page" AS "Website/Landing Page"
       , NULL AS "Search Engine" -- FIXME
       , NULL AS "Lead ID" -- FIXME
       , newleadsource AS "New Lead Source"
@@ -64,8 +64,11 @@ CREATE TABLE kevin_ip.lead_source_report_staging AS (
       , bird_type AS "Bird Type"
     FROM klf.contacts
     -- Custom date range
-    WHERE EXTRACT(year FROM date_created) = 2018 and EXTRACT(month from date_created) = 1
+    WHERE EXTRACT(year FROM date_created) = 2018
+          /*
+          and EXTRACT(month from date_created) = 1
       AND (EXTRACT(day FROM date_created) >= 1 AND EXTRACT(day from date_created) <= 7)
+      */
 );
 
 
