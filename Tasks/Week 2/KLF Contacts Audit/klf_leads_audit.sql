@@ -37,8 +37,7 @@ CREATE TABLE kevin_ip.lead_source_report_staging AS (
       , date_retained AS "Date Retained"
       , retainer_amount AS "Retainer Amount"
       , amount_paid AS "Amount Paid"
-      , to_char(to_date(to_char(date_created::timestamp, 'MM/DD/YYYY HH12:MI:SS PM'), 'MM/DD/YYYY'), 'MM/DD/YYYY')
-          AS "DateCreated" -- unsure if correct var type
+      , to_char(date_created::timestamp, 'MM/DD/YYYY') AS "DateCreated" -- unsure if correct var type
       , to_char(date_created, 'HH12:MI:SS PM') AS "Time" -- unsure if correct var type
       , CASE
           WHEN substring(substring(to_char(date_created, 'HH12:MI:SS PM'),1,2),1,1) = '0'
@@ -177,6 +176,7 @@ LIMIT 15;
 
 -- Date Created
 SELECT date_created::timestamp::date
+  , to_char(date_created::timestamp, 'MM/DD/YYYY')
   , to_char(to_date(to_char(date_created::timestamp, 'MM/DD/YYYY HH12:MI:SS PM'), 'MM/DD/YYYY'), 'MM/DD/YYYY')
   , to_date(to_char(to_date(to_char(date_created::timestamp, 'MM/DD/YYYY HH12:MI:SS PM'), 'MM/DD/YYYY'), 'MM/DD/YYYY'), 'MM/DD/YYYY'
 )
