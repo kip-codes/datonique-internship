@@ -83,23 +83,25 @@ CREATE VIEW kevin_ip.sales_breakdown_fanjoy AS
           CASE WHEN customer_orders_count = 1
             THEN 1
           ELSE 0 END
-      )                                AS new_customers,
+      )                                AS orders_new_customers,
       cast(SUM(
           CASE WHEN customer_orders_count = 1
             THEN 1
           ELSE 0 END
-      )/(cast(count(*) as float)) as DECIMAL(5,4))  AS percent_new_customers,
+      )/(cast(count(*) as float)) as DECIMAL(5,4))  AS percent_orders_new_customers,
       SUM(
           CASE WHEN customer_orders_count > 1
             THEN 1
           ELSE 0 END
-      )                                AS existing_customers,
+      )                                AS orders_existing_customers,
       cast(SUM(
           CASE WHEN customer_orders_count > 1
             THEN 1
           ELSE 0 END
-      )/(cast(count(*) as float)) as DECIMAL(5,4))  AS percent_existing_customers,
-      count(*)                         AS total_customers,
+      )/(cast(count(*) as float)) as DECIMAL(5,4))  AS percent_orders_existing_customers,
+      count(*)                         AS total_orders,
+      count(DISTINCT customer_id)      AS total_customers,
+      cast(cast(count(*) as float)/count(DISTINCT customer_id) as DECIMAL(5,4)) AS avg_order_size,
       SUM(
           CASE WHEN customer_orders_count = 1
             THEN total_price_usd
@@ -120,7 +122,9 @@ CREATE VIEW kevin_ip.sales_breakdown_fanjoy AS
             THEN total_price_usd
           ELSE 0 END
       )/SUM(total_price_usd)        AS percent_existing_customer_sales,
-      SUM(total_price_usd)             AS total_sales
+      SUM(total_price_usd)             AS total_sales,
+      sum(total_price_usd)/count(*)    AS avg_sales_per_order,
+      sum(total_price_usd)/count(DISTINCT customer_id)    AS avg_sales_per_customer
     FROM fanjoy_orders_data
     GROUP BY date_trunc('month',created_at)
     ORDER BY date
@@ -135,23 +139,25 @@ CREATE VIEW kevin_ip.sales_breakdown_team10 AS
           CASE WHEN customer_orders_count = 1
             THEN 1
           ELSE 0 END
-      )                                AS new_customers,
+      )                                AS orders_new_customers,
       cast(SUM(
           CASE WHEN customer_orders_count = 1
             THEN 1
           ELSE 0 END
-      )/(cast(count(*) as float)) as DECIMAL(5,4))  AS percent_new_customers,
+      )/(cast(count(*) as float)) as DECIMAL(5,4))  AS percent_orders_new_customers,
       SUM(
           CASE WHEN customer_orders_count > 1
             THEN 1
           ELSE 0 END
-      )                                AS existing_customers,
+      )                                AS orders_existing_customers,
       cast(SUM(
           CASE WHEN customer_orders_count > 1
             THEN 1
           ELSE 0 END
-      )/(cast(count(*) as float)) as DECIMAL(5,4))  AS percent_existing_customers,
-      count(*)                         AS total_customers,
+      )/(cast(count(*) as float)) as DECIMAL(5,4))  AS percent_orders_existing_customers,
+      count(*)                         AS total_orders,
+      count(DISTINCT customer_id)      AS total_customers,
+      cast(cast(count(*) as float)/count(DISTINCT customer_id) as DECIMAL(5,4)) AS avg_order_size,
       SUM(
           CASE WHEN customer_orders_count = 1
             THEN total_price_usd
@@ -172,7 +178,9 @@ CREATE VIEW kevin_ip.sales_breakdown_team10 AS
             THEN total_price_usd
           ELSE 0 END
       )/SUM(total_price_usd)        AS percent_existing_customer_sales,
-      SUM(total_price_usd)             AS total_sales
+      SUM(total_price_usd)             AS total_sales,
+      sum(total_price_usd)/count(*)    AS avg_sales_per_order,
+      sum(total_price_usd)/count(DISTINCT customer_id)    AS avg_sales_per_customer
     FROM kevin_ip.fod_team10
     GROUP BY date_trunc('month',created_at)
     ORDER BY date

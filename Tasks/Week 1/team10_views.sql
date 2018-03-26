@@ -6,7 +6,7 @@ WHERE (lower(fld.name) like '%erika%'
        or lower(fld.name) like '%jake%paul%'
        or lower(fld.name) like '%ben%hampton%'
        or lower(fld.vendor) like '%jake%paul%'
-       or lower(fld.vendor) like '%team%10%')
+       or lower(fld.vendor) like '%team%10%');
 
 
 -- View of all Jake line items
@@ -30,15 +30,6 @@ SELECT count(*)
 FROM fanjoy_lineitems_data;
 
 
--- View of all orders placed containing Jake line items
-CREATE VIEW fod_jake AS
-  (
-    SELECT fod.*
-    FROM fanjoy_orders_data fod
-      INNER JOIN fld_team10
-        ON fod.order_number = fld_team10.order_number
-  );
-
 -- View of all orders placed containing Jake line items FIXED
 CREATE VIEW kevin_ip.fod_team10 AS
   (
@@ -57,15 +48,6 @@ FROM fod_team10;
 
 
 -- View of all customers linked to orders placed containing Jake line items
-CREATE VIEW fcd_jake AS
-  (
-      SELECT fcd.*
-      FROM fanjoy_customers_data fcd
-        INNER JOIN fod_team10
-          ON fcd.id = fod_team10.customer_id
-      WHERE fcd.total_spent > 0
-  );
-
 -- FIXED
 CREATE VIEW kevin_ip.fcd_team10 AS
   (
@@ -127,5 +109,6 @@ FROM fcd_team10
 WHERE phone IS NOT NULL;
 
 
-SELECT top 5 *
+SELECT *
 FROM fanjoy_lineitems_data
+limit 15;
