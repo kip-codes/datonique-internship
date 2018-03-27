@@ -191,4 +191,20 @@ FROM fanjoy_orders_data
 limit 15;
 
 
+CREATE VIEW kevin_ip.ltd_fanjoy AS (
+  SELECT count(DISTINCT customer_id) as total_customers,
+    count(*) as total_orders,
+    sum(total_price_usd) as total_sales,
+    sum(total_price_usd) / count(*) as avg_order_size
+  FROM fanjoy_orders_data
+);
+
+CREATE VIEW kevin_ip.ltd_team10 AS (
+  SELECT count(DISTINCT customer_id) as total_customers,
+    count(*) as total_orders,
+    sum(total_price_usd) as total_sales,
+    sum(total_price_usd) / count(*) as avg_order_size
+  FROM fod_team10
+);
+
 
