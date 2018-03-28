@@ -182,6 +182,7 @@ CREATE VIEW kevin_ip.sales_breakdown_team10 AS
       sum(total_price_usd)/count(*)    AS avg_sales_per_order,
       sum(total_price_usd)/count(DISTINCT customer_id)    AS avg_sales_per_customer
     FROM kevin_ip.fod_team10
+
     GROUP BY date_trunc('month',created_at)
     ORDER BY date
   );
