@@ -9,7 +9,7 @@ WHERE (lower(fld.name) like '%erika%'
        or lower(fld.vendor) like '%team%10%');
 
 
--- View of all Jake line items
+-- View of all Team 10 line items
 CREATE VIEW kevin_ip.fld_team10 AS
   (
     SELECT *
@@ -22,15 +22,8 @@ CREATE VIEW kevin_ip.fld_team10 AS
           or lower(fld.vendor) like '%team%10%')
   );
 
-SELECT count(*)
-FROM fld_team10;
 
--- Compare against all line items
-SELECT count(*)
-FROM fanjoy_lineitems_data;
-
-
--- View of all orders placed containing Jake line items FIXED
+-- View of all orders placed containing Team 10 line items
 CREATE VIEW kevin_ip.fod_team10 AS
   (
     SELECT fod.*
@@ -41,14 +34,9 @@ CREATE VIEW kevin_ip.fod_team10 AS
             FROM kevin_ip.fld_team10
           )
   );
--- Consider DISTINCT within subquery
-
-SELECT COUNT(*)
-FROM fod_team10;
 
 
 -- View of all customers linked to orders placed containing Jake line items
--- FIXED
 CREATE VIEW kevin_ip.fcd_team10 AS
   (
       SELECT fcd.*
@@ -60,13 +48,6 @@ CREATE VIEW kevin_ip.fcd_team10 AS
             )
 --       AND fcd.total_spent > 0
   );
-
--- Check to see if there are duplicate entries for same person
-SELECT count(*)
-from fcd_team10;
-
-SELECT count(*)
-from fod_team10;
 
 
 ------------------------------------------------------------------

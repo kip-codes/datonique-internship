@@ -171,6 +171,41 @@ FROM
 ORDER BY month ASC
 ;
 
+
+/*
+  Obtain geographical information from customers.
+ */
+
+-- Jake Paul items for new customers ONLY
+SELECT DISTINCT
+  date_trunc('month', fod.created_at) as date,
+  fod.customer_id,
+  fod.customer_first_name + ' ' + fod.customer_last_name as name,
+  fod.customer_email as email,
+  fcd.country,
+  fcd.zip,
+  fcd.city,
+  fod.total_price_usd as total_sales
+FROM fanjoy_orders_data fod
+  JOIN kevin_ip.first_orders_fanjoy
+    ON fod.customer_id = first_orders_fanjoy.customer_id
+      AND date_trunc('month', fod.created_at) = first_orders_fanjoy.first_order_month
+  JOIN fanjoy_customers_data fcd
+    ON fod.customer_id = fcd.id
+WHERE fod.order_number IN (
+  SELECT DISTINCT fld.order_number
+  FROM fanjoy_lineitems_data fld
+  WHERE
+    lower(fld.name) LIKE '%jake%paul%green%now%'
+    OR lower(fld.name) LIKE '%jake%paul%radar%'
+    OR lower(fld.name) LIKE '%jake%paul%mindset%'
+    OR lower(fld.name) LIKE '%jake%paul%vlog%'
+    OR lower(fld.vendor) LIKE '%jake%paul%'
+  )
+ORDER BY date_trunc('month', fod.created_at), total_sales DESC
+;
+
+
 /*
 2. Identify Jake/Team 10's biggest buyer(s) -- maybe we should do this on a quarterly basis.
 Would be good to see who the biggest purchasers are (maybe we split this into a geo infographic)
