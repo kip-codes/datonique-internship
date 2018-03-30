@@ -1,7 +1,7 @@
--- View of all Jake line items
+-- View of all Team 10, no Jake line items
 CREATE VIEW kevin_ip.fld_team10_nojake AS
   (
-    SELECT name
+    SELECT *
     FROM fanjoy_lineitems_data fld
     WHERE
       (
@@ -17,7 +17,7 @@ CREATE VIEW kevin_ip.fld_team10_nojake AS
 ;
 
 
--- View of all orders placed containing Jake line items
+-- View of all orders placed containing Team 10, no Jake line items
 CREATE VIEW kevin_ip.fod_team10_nojake AS
   (
     SELECT fod.*

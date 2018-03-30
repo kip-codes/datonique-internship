@@ -2,7 +2,7 @@
 -- View of all Jake line items
 CREATE VIEW kevin_ip.fld_jakepaul AS
   (
-    SELECT name
+    SELECT *
     FROM fanjoy_lineitems_data fld
     WHERE
       (
