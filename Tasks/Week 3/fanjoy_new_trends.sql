@@ -3,7 +3,173 @@
 I can get you a list of all the specific merchandise that Jake launches on Fanjoy on a month-over-month basis if necessary to make this easier.
  */
 
+-- Cannot use DISTINCT because each row in lineitems has specific order number
 
+-- Get all line items for new merch, JAKE ONLY
+SELECT *
+FROM fanjoy_lineitems_data fld
+WHERE
+  lower(fld.name) like '%jake%paul%green%now%'
+  or lower(fld.name) like '%jake%paul%radar%'
+  or lower(fld.name) like '%jake%paul%mindset%'
+  or lower(fld.name) like '%jake%paul%vlog%'
+;
+
+-- Get all line items for new merch, Team 10 only
+SELECT *
+FROM fanjoy_lineitems_data fld
+WHERE
+  lower(fld.name) like '%team%10%gaming%'
+  or lower(fld.name) like '%chance%&%anthony%athena%'
+  or lower(fld.name) like 'erika%let''s%party%'
+  or lower(fld.name) like 'erika%fanny%' -- Fanny packs not included in GOAT or WILD
+  or lower(fld.name) like 'erika%wild%phone%'
+  or lower(fld.name) like 'erika%goat%phone%'
+  or lower(fld.name) like 'erika%spring%break%'
+  or lower(fld.name) like 'erika%bandana%'
+  or lower(fld.vendor) like '%jake%paul%'
+  or lower(fld.vendor) like '%team%10%'
+;
+
+-- In case all new merch isn't encapsulated by fod_team10, match against all of FanJoy.
+SELECT
+A.month,
+A.total_customers,
+A.total_orders,
+A.total_sales,
+B.new_customers,
+B.new_orders,
+B.new_sales,
+(A.total_customers-B.new_customers) as existing_customers,
+(A.total_orders-B.new_orders) as existing_orders,
+(A.total_sales-B.new_sales) as existing_sales,
+cast(B.new_customers as float)/A.total_customers as percent_new_customers,
+cast(B.new_orders as float)/A.total_orders as percent_new_orders,
+cast(B.new_sales as float)/A.total_sales as percent_new_sales
+
+/*
+  TOTALS ARE DEFINED BY NEW MERCH SALES, Jake Paul ONLY.
+ */
+FROM
+  (
+    SELECT
+    date_trunc('month', fod.created_at) as month,
+      COUNT(distinct fod.customer_id) AS total_customers,
+      COUNT(distinct order_number) as total_orders,
+      SUM(total_price_usd) as total_sales
+    FROM fanjoy_orders_data fod
+    WHERE fod.order_number IN (
+      SELECT DISTINCT fld.order_number
+      FROM fanjoy_lineitems_data fld
+      WHERE
+        lower(fld.name) like '%jake%paul%green%now%'
+        or lower(fld.name) like '%jake%paul%radar%'
+        or lower(fld.name) like '%jake%paul%mindset%'
+        or lower(fld.name) like '%jake%paul%vlog%'
+        or lower(fld.vendor) like '%jake%paul%'
+    )
+    GROUP BY 1
+  ) as A
+  JOIN
+  (
+    SELECT
+      date_trunc('month', fod.created_at) as month,
+      COUNT(distinct fod.customer_id) AS new_customers,
+      COUNT(distinct order_number) as new_orders,
+      SUM(total_price_usd) as new_sales
+    FROM fanjoy_orders_data fod
+      JOIN kevin_ip.first_orders_fanjoy
+        ON fod.customer_id = first_orders_fanjoy.customer_id
+          AND date_trunc('month', fod.created_at) = first_orders_fanjoy.first_order_month
+    WHERE fod.order_number IN (
+      SELECT DISTINCT fld.order_number
+      FROM fanjoy_lineitems_data fld
+      WHERE
+        lower(fld.name) like '%jake%paul%green%now%'
+        or lower(fld.name) like '%jake%paul%radar%'
+        or lower(fld.name) like '%jake%paul%mindset%'
+        or lower(fld.name) like '%jake%paul%vlog%'
+        or lower(fld.vendor) like '%jake%paul%'
+    )
+    GROUP BY 1
+  ) as B
+  on A.month = B.month
+ORDER BY month ASC
+;
+
+
+SELECT
+A.month,
+A.total_customers,
+A.total_orders,
+A.total_sales,
+B.new_customers,
+B.new_orders,
+B.new_sales,
+(A.total_customers-B.new_customers) as existing_customers,
+(A.total_orders-B.new_orders) as existing_orders,
+(A.total_sales-B.new_sales) as existing_sales,
+cast(B.new_customers as float)/A.total_customers as percent_new_customers,
+cast(B.new_orders as float)/A.total_orders as percent_new_orders,
+cast(B.new_sales as float)/A.total_sales as percent_new_sales
+
+/*
+  TOTALS ARE DEFINED BY NEW MERCH SALES, Team 10 ONLY.
+ */
+FROM
+  (
+    SELECT
+    date_trunc('month', fod.created_at) as month,
+      COUNT(distinct fod.customer_id) AS total_customers,
+      COUNT(distinct order_number) as total_orders,
+      SUM(total_price_usd) as total_sales
+    FROM fanjoy_orders_data fod
+    WHERE fod.order_number IN (
+      SELECT DISTINCT fld.order_number
+      FROM fanjoy_lineitems_data fld
+      WHERE
+        lower(fld.name) like '%team%10%gaming%'
+        or lower(fld.name) like '%chance%&%anthony%athena%'
+        or lower(fld.name) like 'erika%let''s%party%'
+        or lower(fld.name) like 'erika%fanny%' -- Fanny packs not included in GOAT or WILD
+        or lower(fld.name) like 'erika%wild%phone%'
+        or lower(fld.name) like 'erika%goat%phone%'
+        or lower(fld.name) like 'erika%spring%break%'
+        or lower(fld.name) like 'erika%bandana%'
+        or lower(fld.vendor) like '%team%10%'
+    )
+    GROUP BY 1
+  ) as A
+  JOIN
+  (
+    SELECT
+      date_trunc('month', fod.created_at) as month,
+      COUNT(distinct fod.customer_id) AS new_customers,
+      COUNT(distinct order_number) as new_orders,
+      SUM(total_price_usd) as new_sales
+    FROM fanjoy_orders_data fod
+      JOIN kevin_ip.first_orders_fanjoy
+        ON fod.customer_id = first_orders_fanjoy.customer_id
+          AND date_trunc('month', fod.created_at) = first_orders_fanjoy.first_order_month
+    WHERE fod.order_number IN (
+      SELECT DISTINCT fld.order_number
+      FROM fanjoy_lineitems_data fld
+      WHERE
+        lower(fld.name) like '%team%10%gaming%'
+        or lower(fld.name) like '%chance%&%anthony%athena%'
+        or lower(fld.name) like 'erika%let''s%party%'
+        or lower(fld.name) like 'erika%fanny%' -- Fanny packs not included in GOAT or WILD
+        or lower(fld.name) like 'erika%wild%phone%'
+        or lower(fld.name) like 'erika%goat%phone%'
+        or lower(fld.name) like 'erika%spring%break%'
+        or lower(fld.name) like 'erika%bandana%'
+        or lower(fld.vendor) like '%team%10%'
+    )
+    GROUP BY 1
+  ) as B
+  on A.month = B.month
+ORDER BY month ASC
+;
 
 /*
 2. Identify Jake/Team 10's biggest buyer(s) -- maybe we should do this on a quarterly basis.
