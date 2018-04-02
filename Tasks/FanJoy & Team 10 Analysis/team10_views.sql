@@ -86,3 +86,11 @@ WHERE phone IS NOT NULL;
 SELECT *
 FROM fanjoy_lineitems_data
 limit 15;
+
+
+SELECT name
+from fld_team10
+WHERE
+  lower(vendor) like '%team%10%'
+  and lower(name) not like '%jake%'
+;
