@@ -1,13 +1,3 @@
--- Get all line items from Team10
-SELECT name
-FROM fanjoy_lineitems_data fld
-WHERE (lower(fld.name) like '%erika%'
-       or lower(fld.name) like '%team%10%'
-       or lower(fld.name) like '%jake%paul%'
-       or lower(fld.name) like '%ben%hampton%'
-       or lower(fld.vendor) like '%jake%paul%'
-       or lower(fld.vendor) like '%team%10%');
-
 
 -- View of all Team 10 line items
 CREATE VIEW kevin_ip.fld_team10 AS
@@ -15,11 +5,14 @@ CREATE VIEW kevin_ip.fld_team10 AS
     SELECT *
     FROM fanjoy_lineitems_data fld
     WHERE (lower(fld.name) like '%erika%'
-          or lower(fld.name) like '%team%10%'
-          or lower(fld.name) like '%jake%paul%'
-          or lower(fld.name) like '%ben%hampton%'
-          or lower(fld.vendor) like '%jake%paul%'
-          or lower(fld.vendor) like '%team%10%')
+       or lower(fld.name) like '%team%10%'
+       or lower(fld.name) like '%chance%'
+       or lower(fld.name) like '%anthony%'
+       or lower(fld.name) like '%nick%crompton%'
+       or lower(fld.name) like '%jake%paul%'
+       or lower(fld.name) like '%ben%hampton%'
+       or lower(fld.vendor) like '%jake%paul%'
+       or lower(fld.vendor) like '%team%10%')
   );
 
 
