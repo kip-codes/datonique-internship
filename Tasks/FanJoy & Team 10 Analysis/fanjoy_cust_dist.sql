@@ -7,8 +7,6 @@
 -- 6. % of total orders = {3} / sum{3}
 -- 7. Average order size = {2} / {3}
 
-
-
 -- First, pull all the individual data necessary before filtering.
 SELECT
   customer_id,
