@@ -58,7 +58,7 @@ CREATE VIEW kevin_ip.fcd_team10 AS
 CREATE VIEW kevin_ip.fld_jakepaul AS
   (
     SELECT *
-    FROM fanjoy_lineitems_data fld
+    FROM kevin_ip.fld_team10 fld
     WHERE
       (
         lower(fld.name) like '%jake%paul%'
@@ -72,11 +72,11 @@ CREATE VIEW kevin_ip.fld_jakepaul AS
 CREATE VIEW kevin_ip.fod_jakepaul AS
   (
     SELECT fod.*
-    FROM fanjoy_orders_data fod
+    FROM kevin_ip.fod_team10 fod
     WHERE fod.order_number IN
           (
-            SELECT DISTINCT order_number
-            FROM kevin_ip.fld_jakepaul
+            SELECT DISTINCT fld.order_number
+            FROM kevin_ip.fld_jakepaul fld
           )
   )
 ;
@@ -86,21 +86,13 @@ CREATE VIEW kevin_ip.fod_jakepaul AS
 CREATE VIEW kevin_ip.fld_team10_nojake AS
   (
     SELECT *
-    FROM fanjoy_lineitems_data fld
-    WHERE
-      (
-        lower(fld.name) not like '%jake%paul%'
-          AND
-        lower(fld.vendor) not like '%jake%paul%'
-          AND
-        (lower(fld.name) like '%team%10%'
-        or lower(fld.name) like '%erika%'
-        or lower(fld.name) like '%chance%'
-        or lower(fld.name) like '%anthony%'
-        or lower(fld.name) like '%nick%crompton%'
-        or lower(fld.name) like '%ben%hampton%'
-        or lower(fld.vendor) like '%team%10%')
-      )
+    FROM kevin_ip.fld_team10 fld
+    WHERE fld.order_number NOT IN
+          (
+            SELECT DISTINCT order_number
+            FROM kevin_ip.fld_jakepaul
+          )
+
   )
 ;
 
@@ -109,7 +101,7 @@ CREATE VIEW kevin_ip.fld_team10_nojake AS
 CREATE VIEW kevin_ip.fod_team10_nojake AS
   (
     SELECT fod.*
-    FROM fanjoy_orders_data fod
+    FROM kevin_ip.fod_team10 fod
     WHERE fod.order_number IN
           (
             SELECT DISTINCT order_number
