@@ -81,9 +81,9 @@ SELECT
   COUNT(distinct order_number) as new_orders,
   SUM(total_price_usd) as new_sales
 FROM fod_team10 fod
-  JOIN kevin_ip.first_orders_team10
-    ON fod.customer_id = first_orders_team10.customer_id
-      AND date_trunc('month', fod.created_at) = first_orders_team10.first_order_month
+  JOIN kevin_ip.first_orders_fanjoy
+    ON fod.customer_id = first_orders_fanjoy.customer_id
+      AND date_trunc('month', fod.created_at) = first_orders_fanjoy.first_order_month
 GROUP BY 1
 ) as B
 on A.month = B.month
@@ -128,9 +128,9 @@ SELECT
   COUNT(distinct order_number) as new_orders,
   SUM(total_price_usd) as new_sales
 FROM fod_jakepaul fod
-  JOIN kevin_ip.first_orders_team10
-    ON fod.customer_id = first_orders_team10.customer_id
-      AND date_trunc('month', fod.created_at) = first_orders_team10.first_order_month
+  JOIN kevin_ip.first_orders_fanjoy
+    ON fod.customer_id = first_orders_fanjoy.customer_id
+      AND date_trunc('month', fod.created_at) = first_orders_fanjoy.first_order_month
 GROUP BY 1
 ) as B
 on A.month = B.month
@@ -176,9 +176,9 @@ SELECT
   COUNT(distinct order_number) as new_orders,
   SUM(total_price_usd) as new_sales
 FROM fod_team10_nojake fod
-  JOIN kevin_ip.first_orders_team10
-    ON fod.customer_id = first_orders_team10.customer_id
-      AND date_trunc('month', fod.created_at) = first_orders_team10.first_order_month
+  JOIN kevin_ip.first_orders_fanjoy
+    ON fod.customer_id = first_orders_fanjoy.customer_id
+      AND date_trunc('month', fod.created_at) = first_orders_fanjoy.first_order_month
 GROUP BY 1
 ) as B
 on A.month = B.month

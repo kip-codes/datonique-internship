@@ -130,3 +130,70 @@ WHERE
   and created_at <= current_timestamp
   and created_at >= current_timestamp - INTEGER '365'
 ;
+
+
+
+
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+
+/*
+
+can you run the revenue for Team 10 and Nick Crompton over the last 12 months and give me the revenue by month
+as well as the average monthly revenue for Team 10 and Nick Crompton separately?
+
+*/
+
+-- All of Team 10 Revenue
+SELECT
+  fld.title as title,
+  SUM(fld.quantity) as qty,
+  SUM(price) as total_price
+FROM fld_team10 fld
+GROUP BY
+  fld.title
+ORDER BY
+  total_price DESC
+:
+-- $18M vs Shopify $28M
+
+-- Nick Crompton only Revenue
+SELECT
+  fld.title as title,
+  sum(fld.quantity) as qty,
+  SUM(price) as total_price
+FROM fld_team10 fld
+WHERE
+      lower(fld.title) LIKE '%nick%crompton%'
+GROUP BY fld.title
+ORDER BY total_price DESC
+;
+-- $50K vs Shopify $48k
+
+
+
+-- Team 10, excl. Jake Paul Revenue
+SELECT
+  fld.title as title,
+  sum(fld.quantity) as qty,
+  sum(price) as total_price
+FROM fld_team10_nojake fld
+GROUP BY fld.title
+ORDER BY total_price DESC
+;
+
+
+-- Jake Paul only
+SELECT
+  fld.title as title,
+  sum(fld.quantity) as qty,
+  sum(price) as total_price
+FROM fld_team10 fld
+WHERE lower(fld.title) LIKE '%jake%paul%'
+GROUP BY fld.title
+ORDER BY total_price DESC
+;
+
+SELECT *
+FROM fanjoy_orders_data
+LIMIT 1;
