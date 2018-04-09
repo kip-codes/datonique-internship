@@ -2,10 +2,11 @@
 ------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------
 /*
-  Customer Distrution for New vs. Existing Sales
+  Customer Distribution for New vs. Existing Sales
 
   Table/View Dependencies:
-    kevin_ip.fod_<Team10, Jake Paul, Team10 no Jake>: Base data extract
+    kevin_ip.fod_{Team10, Jake Paul, Team10 no Jake}: Base data extract
+    kevin_ip.fld_{Team10, Jake Paul, Team10 no Jake}: Base data extract
     kevin_ip.first_orders_fanjoy: Used to determine the whether a particular order is a customer's first order placed.
  */
 ------------------------------------------------------------------------------------------------
@@ -248,3 +249,5 @@ JOIN
 on A.month = B.month
 ORDER BY A.month
 ;
+
+

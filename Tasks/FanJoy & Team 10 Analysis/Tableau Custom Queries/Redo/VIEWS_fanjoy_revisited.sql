@@ -1,5 +1,4 @@
 
-
 /*
   Use Custom SQL Queries within Tableau Workbook for these views to keep separate from previous version of .twbx
  */
