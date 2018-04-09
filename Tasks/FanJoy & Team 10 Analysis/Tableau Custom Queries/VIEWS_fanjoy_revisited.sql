@@ -1,4 +1,9 @@
 
+
+/*
+  Use Custom SQL Queries within Tableau Workbook for these views to keep separate from previous version of .twbx
+ */
+
 --------------------------------------------------------------------
 --------------------------------------------------------------------
 /*
@@ -270,60 +275,48 @@ order by 1;
  */
 
 
-CREATE VIEW kevin_ip.ltd_fanjoy AS (
-  SELECT count(DISTINCT customer_id) as total_customers,
-    count(*) as total_orders,
-    sum(total_price_usd) as total_sales,
-    sum(total_price_usd) / count(*) as avg_order_size
-  FROM fanjoy_orders_data
-);
-
-CREATE VIEW kevin_ip.ltd_team10 AS (
-  SELECT count(DISTINCT customer_id) as total_customers,
-    count(*) as total_orders,
-    sum(total_price_usd) as total_sales,
-    sum(total_price_usd) / count(*) as avg_order_size
-  FROM fod_team10
+-- LTD Fanjoy, all
+SELECT
+  count(DISTINCT customer_id) as total_customers,
+  count(DISTINCT order_number) as total_orders,
+  (
+    SELECT sum(price)
+    from fanjoy_lineitems_data
+  ) as total_sales
+FROM fanjoy_orders_data
 );
 
 
-CREATE VIEW kevin_ip.ltd_jakepaul AS (
-  SELECT
-    count(DISTINCT customer_id) as total_customers,
-    count(*) as total_orders,
-    sum(total_price_usd) as total_sales,
-    sum(total_price_usd) / count(*) as avg_order_size
-  FROM fod_jakepaul
-)
+-- LTD Team 10
+SELECT
+  count(DISTINCT customer_id) as total_customers,
+  count(DISTINCT order_number) as total_orders,
+  (
+    SELECT sum(price)
+    from fld_team10
+  ) as total_sales
+FROM fod_team10
 ;
 
 
-CREATE VIEW kevin_ip.ltd_team10_nojake AS (
-  SELECT count(DISTINCT customer_id) as total_customers,
-    count(*) as total_orders,
-    sum(total_price_usd) as total_sales,
-    sum(total_price_usd) / count(*) as avg_order_size
-  FROM fod_team10_nojake
-)
+-- LTD Jake Paul only
+SELECT
+  count(DISTINCT customer_id) as total_customers,
+  count(DISTINCT order_number) as total_orders,
+  (
+    SELECT sum(price)
+    from fld_jakepaul
+  ) as total_sales
+FROM fod_jakepaul
 ;
 
-
-
-----------------------------------------------------------------
-----------------------------------------------------------------
-/*
-
-  FIRST ORDERS FOR ALL OF FANJOY
-  No need for seperate views for subset, use entire Fanjoy set
-
- */
-
-CREATE VIEW kevin_ip.first_orders_fanjoy AS (
-  SELECT DISTINCT
-    customer_id,
-    MIN(date_trunc('month', created_at)) AS first_order_month
-  FROM fanjoy_orders_data
-  WHERE customer_id > 0 and customer_id IS NOT NULL
-  GROUP BY customer_id
-  ORDER BY customer_id
-);
+-- LTD Team 10, excl. Jake
+SELECT
+  count(DISTINCT customer_id) as total_customers,
+  count(DISTINCT order_number) as total_orders,
+  (
+    SELECT sum(price)
+    from fld_team10_nojake
+  ) as total_sales
+FROM fod_team10_nojake
+;
