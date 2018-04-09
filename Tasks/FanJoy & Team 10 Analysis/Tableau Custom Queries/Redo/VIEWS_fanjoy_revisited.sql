@@ -230,6 +230,7 @@ SELECT
        /(SELECT SUM(fld.price) FROM fld_team10_nojake fld) AS DECIMAL(5, 4))
     AS percent_total_spent,
   -- Note: Orders total does not equal the line items price total!
+  -- This is because of overlap between line item subsets. One order can contain line items from other subsets.
 
   cast(cast(SUM(data.total_orders) AS FLOAT)
        /(SELECT count(DISTINCT fod.order_number) FROM fod_team10_nojake fod) AS DECIMAL(5, 4))
@@ -282,9 +283,10 @@ SELECT
   (
     SELECT sum(price)
     from fanjoy_lineitems_data
-  ) as total_sales
+  ) as total_sales,
+  (SELECT sum(price) FROM fanjoy_lineitems_data) / count(distinct order_number) as avg_order_size
 FROM fanjoy_orders_data
-);
+;
 
 
 -- LTD Team 10
@@ -294,7 +296,8 @@ SELECT
   (
     SELECT sum(price)
     from fld_team10
-  ) as total_sales
+  ) as total_sales,
+  (SELECT sum(price) FROM fld_team10) / count(distinct order_number) as avg_order_size
 FROM fod_team10
 ;
 
@@ -306,7 +309,8 @@ SELECT
   (
     SELECT sum(price)
     from fld_jakepaul
-  ) as total_sales
+  ) as total_sales,
+  (SELECT sum(price) FROM fld_jakepaul) / count(distinct order_number) as avg_order_size
 FROM fod_jakepaul
 ;
 
@@ -317,6 +321,7 @@ SELECT
   (
     SELECT sum(price)
     from fld_team10_nojake
-  ) as total_sales
+  ) as total_sales,
+  (SELECT sum(price) FROM fld_team10_nojake) / count(distinct order_number) as avg_order_size
 FROM fod_team10_nojake
 ;
