@@ -154,7 +154,7 @@ GROUP BY
   fld.title
 ORDER BY
   total_price DESC
-:
+;
 -- $18M vs Shopify $28M
 
 -- Nick Crompton only Revenue
@@ -194,6 +194,10 @@ GROUP BY fld.title
 ORDER BY total_price DESC
 ;
 
-SELECT *
-FROM fanjoy_orders_data
-LIMIT 1;
+SELECT
+  fld.title as title,
+  sum(fld.quantity) as qty,
+  sum(price) as total_price
+FROM fld_jakepaul fld
+GROUP BY fld.title
+ORDER BY total_price DESC

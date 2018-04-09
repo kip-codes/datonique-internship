@@ -20,6 +20,12 @@ CREATE VIEW kevin_ip.fld_team10 AS
        or lower(fld.title) like '%nick%crompton%'
        or lower(fld.title) like '%jake%paul%'
        or lower(fld.title) like '%ben%hampton%'
+       or lower(fld.name) like '%erika%'
+       or lower(fld.name) like '%team%10%'
+       or lower(fld.name) like '%chance%&%anthony%'
+       or lower(fld.name) like '%nick%crompton%'
+       or lower(fld.name) like '%jake%paul%'
+       or lower(fld.name) like '%ben%hampton%'
        or lower(fld.vendor) like '%jake%paul%'
        or lower(fld.vendor) like '%team%10%')
   );
@@ -35,9 +41,10 @@ CREATE VIEW kevin_ip.fod_team10 AS
             FROM kevin_ip.fld_team10
           )
   );
---
---
--- View of all customers linked to orders placed containing Jake line items
+
+
+
+-- View of all customers linked to orders placed containing Team 10 line items
 CREATE VIEW kevin_ip.fcd_team10 AS
   (
       SELECT fcd.*
@@ -59,6 +66,7 @@ CREATE VIEW kevin_ip.fld_jakepaul AS
     WHERE
       (
         lower(fld.title) like '%jake%paul%'
+        or lower(fld.name) like '%jake%paul%'
         or lower(fld.vendor) like '%jake%paul%'
       )
   )
@@ -91,12 +99,30 @@ CREATE VIEW kevin_ip.fld_team10_nojake AS
             or lower(fld.title) like '%chance%&%anthony%'
             or lower(fld.title) like '%nick%crompton%'
             or lower(fld.title) like '%ben%hampton%'
-            or lower(fld.title) like '%team%10%'
+            or lower(fld.name) like '%erika%'
+            or lower(fld.name) like '%team%10%'
+            or lower(fld.name) like '%chance%&%anthony%'
+            or lower(fld.name) like '%nick%crompton%'
+            or lower(fld.name) like '%ben%hampton%'
+            or lower(fld.vendor) like '%team%10%'
           )
-
+          AND
+          (
+            lower(fld.name) NOT LIKE '%jake%paul%'
+            AND lower(fld.title) NOT LIKE '%jake%paul%'
+            AND lower(fld.vendor) NOT LIKE '%jake%paul%'
+          )
   )
 ;
 
+SELECT *
+FROM fld_team10
+WHERE
+  (title ILIKE '%jake%paul%'
+   OR title ILIKE '%erika%'
+  )
+  AND vendor NOT ILIKE '%fanjoy%'
+LIMIT 20;
 
 
 -- View of all orders placed containing Team 10, no Jake line items
@@ -111,6 +137,8 @@ CREATE VIEW kevin_ip.fod_team10_nojake AS
           )
   )
 ;
+
+
 
 --------------------------------------------------------------------
 --------------------------------------------------------------------
@@ -313,6 +341,8 @@ CREATE VIEW kevin_ip.dist_team10_nojake AS
   );
 
 
+
+
 --------------------------------------------------------------------
 --------------------------------------------------------------------
 /*
@@ -358,6 +388,7 @@ CREATE VIEW kevin_ip.ltd_team10_nojake AS (
   FROM fod_team10_nojake
 )
 ;
+
 
 
 ----------------------------------------------------------------
