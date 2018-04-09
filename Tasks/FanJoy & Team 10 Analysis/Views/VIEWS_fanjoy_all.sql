@@ -15,19 +15,22 @@ CREATE VIEW kevin_ip.fld_team10 AS
     SELECT *
     FROM fanjoy_lineitems_data fld
     WHERE (lower(fld.title) like '%erika%'
-       or lower(fld.title) like '%team%10%'
-       or lower(fld.title) like '%chance%&%anthony%'
-       or lower(fld.title) like '%nick%crompton%'
-       or lower(fld.title) like '%jake%paul%'
-       or lower(fld.title) like '%ben%hampton%'
-       or lower(fld.name) like '%erika%'
-       or lower(fld.name) like '%team%10%'
-       or lower(fld.name) like '%chance%&%anthony%'
-       or lower(fld.name) like '%nick%crompton%'
-       or lower(fld.name) like '%jake%paul%'
-       or lower(fld.name) like '%ben%hampton%'
-       or lower(fld.vendor) like '%jake%paul%'
-       or lower(fld.vendor) like '%team%10%')
+      or lower(fld.title) like '%team%10%'
+      or fld.title ILIKE '%team%ten%'
+      or lower(fld.title) like '%chance%&%anthony%'
+      or lower(fld.title) like '%nick%crompton%'
+      or lower(fld.title) like '%jake%paul%'
+      or lower(fld.title) like '%ben%hampton%'
+      or lower(fld.name) like '%erika%'
+      or lower(fld.name) like '%team%10%'
+      or fld.name ilike '%team%ten%'
+      or lower(fld.name) like '%chance%&%anthony%'
+      or lower(fld.name) like '%nick%crompton%'
+      or lower(fld.name) like '%jake%paul%'
+      or lower(fld.name) like '%ben%hampton%'
+      or lower(fld.vendor) like '%jake%paul%'
+      or lower(fld.vendor) like '%team%10%'
+      or fld.vendor ilike '%team%ten%')
   );
 
 -- View of all orders placed containing Team 10 line items
@@ -96,15 +99,18 @@ CREATE VIEW kevin_ip.fld_team10_nojake AS
           (
             lower(fld.title) like '%erika%'
             or lower(fld.title) like '%team%10%'
+            or fld.title ilike '%team%ten%'
             or lower(fld.title) like '%chance%&%anthony%'
             or lower(fld.title) like '%nick%crompton%'
             or lower(fld.title) like '%ben%hampton%'
             or lower(fld.name) like '%erika%'
             or lower(fld.name) like '%team%10%'
+            or fld.name ilike '%team%ten%'
             or lower(fld.name) like '%chance%&%anthony%'
             or lower(fld.name) like '%nick%crompton%'
             or lower(fld.name) like '%ben%hampton%'
             or lower(fld.vendor) like '%team%10%'
+            or fld.vendor ilike '%team%ten%'
           )
           AND
           (
@@ -115,14 +121,6 @@ CREATE VIEW kevin_ip.fld_team10_nojake AS
   )
 ;
 
-SELECT *
-FROM fld_team10
-WHERE
-  (title ILIKE '%jake%paul%'
-   OR title ILIKE '%erika%'
-  )
-  AND vendor NOT ILIKE '%fanjoy%'
-LIMIT 20;
 
 
 -- View of all orders placed containing Team 10, no Jake line items
