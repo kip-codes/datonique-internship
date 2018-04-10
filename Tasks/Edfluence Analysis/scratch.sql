@@ -43,6 +43,7 @@ ORDER BY user_id
 SELECT *
 FROM wp_pmpro_membership_orders
 WHERE date(timestamp) = '2018-02-04'
+;
 
 SELECT * FROM wp_pmpro_membership_orders;
 
@@ -139,12 +140,102 @@ WHERE status like 'active'
 ;
 
 
--- Get first success timestamp for all members from new membership orders data
+-- Get last success timestamp for all members from new membership orders data
 SELECT
   user_id,
   status,
-  min(timestamp) as first_success
+  max(timestamp) as last_success
 FROM wp_pmpro_membership_orders
 WHERE status like 'success'
 GROUP BY user_id, status
+;
+
+
+-- Get last refund timestamp for all members from new membership order data
+SELECT
+  user_id,
+  status,
+  max(timestamp) as last_refund
+FROM wp_pmpro_membership_orders
+WHERE status like 'cancelled'
+GROUP BY user_id, status
+;
+
+-- Compare last success to last refund
+-- Missing IDs from cancelled set imply link to historical data
+SELECT
+#   COUNT(DISTINCT A.user_id) AS num_active
+  CASE
+    WHEN user_id_cancelled IS NULL
+      THEN user_id_success
+    ELSE  -- user_id_cancelled exists
+      CASE
+        WHEN last_success > last_refund
+          then user_id_success
+      END
+  END as user_id
+FROM
+  (
+    SELECT
+      user_id AS user_id_success,
+      status,
+      max(timestamp) as last_success
+    FROM wp_pmpro_membership_orders
+    WHERE status like 'success'
+    GROUP BY user_id, status
+  ) AS A
+  LEFT JOIN
+  (
+    SELECT
+      user_id as user_id_cancelled,
+      status,
+      max(timestamp) as last_refund
+    FROM wp_pmpro_membership_orders
+    WHERE status like 'cancelled'
+    GROUP BY user_id, status
+  ) AS B
+  on A.user_id_success = B.user_id_cancelled
+;
+
+
+-- NO REFUNDS AFTER SUCCESSFUL TIMESTAMPS
+SELECT *
+FROM
+  (
+    SELECT
+      user_id AS user_id_success,
+      status,
+      max(timestamp) as last_success
+    FROM wp_pmpro_membership_orders
+    WHERE status like 'success'
+    GROUP BY user_id, status
+  ) AS A
+  JOIN
+  (
+    SELECT
+      user_id as user_id_cancelled,
+      status,
+      max(timestamp) as last_refund
+    FROM wp_pmpro_membership_orders
+    WHERE status like 'cancelled'
+    GROUP BY user_id, status
+  ) AS B
+  on A.user_id_success = B.user_id_cancelled
+  where last_refund > last_success
+;
+
+/*
+  Monthly Breakdown by User Type
+
+  User Types:
+
+  1. Inner Circle (id 1)
+  2. Inner Circle JHA (id 2)
+  3. Road Map (id 3)
+  4. Roadmap JHA (id 4)
+ */
+
+
+SELECT *
+from wp_pmpro_membership_levels
 ;
