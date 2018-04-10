@@ -198,7 +198,7 @@ FROM
 ;
 
 
--- NO REFUNDS AFTER SUCCESSFUL TIMESTAMPS
+-- NO REFUNDS with new data
 SELECT *
 FROM
   (
@@ -224,6 +224,8 @@ FROM
   where last_refund > last_success
 ;
 
+
+
 /*
   Monthly Breakdown by User Type
 
@@ -235,7 +237,28 @@ FROM
   4. Roadmap JHA (id 4)
  */
 
-
-SELECT *
-from wp_pmpro_membership_levels
+SELECT
+  date(timestamp) as date,
+  CASE
+    WHEN membership_id = 1 THEN count(distinct user_id)
+    else 0
+  END AS "Inner Circle",
+  CASE
+    WHEN membership_id = 2 THEN count(distinct user_id)
+    else 0
+  END AS "Inner Circle JHA",
+  CASE
+    WHEN membership_id = 3 THEN count(distinct user_id)
+    else 0
+  END AS "Roadmap",
+  CASE
+    WHEN membership_id = 4 THEN count(distinct user_id)
+    else 0
+  END AS "Roadmap JHA",
+  count(distinct user_id) as total_success,
+  sum(total) as gross_sales_USD
+FROM wp_pmpro_membership_orders
+WHERE status like 'success'
+GROUP BY date(timestamp), membership_id
+ORDER BY date
 ;

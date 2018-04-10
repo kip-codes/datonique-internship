@@ -14,30 +14,67 @@
 
 SELECT
   A.date,
-  A.total_buyers,
-  -- TODO: Breakdown by Membership Type
   A.num_success,
-  A.total_gross_USD,
   B.num_canceled,
+  A.total_buyers,
   A.num_success + B.num_canceled as total_transactions,
+  -- TODO: running total of members (needs to account for refunds)
+  A.`Inner Circle Success`,
+  A.`Inner Circle JHA Success`,
+  A.`Roadmap Success`,
+  A.`Roadmap JHA Success`,
+  A.total_gross_USD,
   B.total_refunds_USD,
   A.total_gross_USD - B.total_refunds_USD AS net_sales_USD
 FROM
   (
     SELECT
       date(timestamp) as date,
+      CASE
+        WHEN membership_id = 1 THEN count(distinct user_id)
+        else 0
+      END AS "Inner Circle Success",
+      CASE
+        WHEN membership_id = 2 THEN count(distinct user_id)
+        else 0
+      END AS "Inner Circle JHA Success",
+      CASE
+        WHEN membership_id = 3 THEN count(distinct user_id)
+        else 0
+      END AS "Roadmap Success",
+      CASE
+        WHEN membership_id = 4 THEN count(distinct user_id)
+        else 0
+      END AS "Roadmap JHA Success",
       COUNT(distinct user_id) as total_buyers,
-      COUNT(*) as num_success,
+      COUNT(distinct id) as num_success,
       SUM(total) as total_gross_USD
     FROM wp_pmpro_membership_orders
     WHERE status like 'success'
-    group by date(timestamp)
+    group by date(timestamp), membership_id
   ) as A
   JOIN
   (
     SELECT
       date(timestamp) as date,
-      COUNT(*) as num_canceled,
+      CASE
+        WHEN membership_id = 1 THEN count(distinct user_id)
+        else 0
+      END AS "Inner Circle Refunded",
+      CASE
+        WHEN membership_id = 2 THEN count(distinct user_id)
+        else 0
+      END AS "Inner Circle JHA Refunded",
+      CASE
+        WHEN membership_id = 3 THEN count(distinct user_id)
+        else 0
+      END AS "Roadmap Refunded",
+      CASE
+        WHEN membership_id = 4 THEN count(distinct user_id)
+        else 0
+      END AS "Roadmap JHA Refunded",
+      COUNT(DISTINCT user_id) AS total_refunds,
+      COUNT(distinct id) as num_canceled,
       SUM(total) as total_refunds_USD
     FROM wp_pmpro_membership_orders
     WHERE status like 'cancelled'
