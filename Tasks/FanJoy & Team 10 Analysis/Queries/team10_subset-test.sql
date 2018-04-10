@@ -23,3 +23,7 @@ WHERE id NOT IN
         from fld_team10_nojake
       )
 ;
+
+
+select count(*)
+FROM fanjoy_lineitems_data;
