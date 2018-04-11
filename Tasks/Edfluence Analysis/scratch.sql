@@ -262,3 +262,7 @@ WHERE status like 'success'
 GROUP BY date(timestamp), membership_id
 ORDER BY date
 ;
+
+
+SELECT *
+FROM wp_pmpro_memberships_users;

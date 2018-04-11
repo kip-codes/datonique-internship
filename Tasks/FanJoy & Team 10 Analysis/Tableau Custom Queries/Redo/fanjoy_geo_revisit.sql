@@ -35,7 +35,7 @@ FROM
   JOIN
   -- Orders data
   (
-    SELECT
+    SELECT DISTINCT
       order_number,
       customer_id
     FROM fanjoy_orders_data
@@ -44,7 +44,7 @@ FROM
   -- Customer data
   JOIN
   (
-    SELECT
+    SELECT DISTINCT
       id,
       country,
       city

@@ -14,31 +14,31 @@
 
 SELECT
   A.date,
-  A.num_success, -- transaction
-  B.num_canceled, -- transaction
-  A.total_buyers, -- customer
-  B.total_refunds, -- customer
-  A.num_success + B.num_canceled as total_transactions,
+  SUM(A.num_success), -- transaction
+  SUM(B.num_canceled), -- transaction
+  SUM(A.total_buyers), -- customer
+  SUM(B.total_refunds), -- customer
+  SUM(A.num_success + B.num_canceled) as total_transactions,
   -- TODO: running total of members (needs to account for refunds)
-  A.`Inner Circle Success`,
-  A.`Inner Circle Gross`,
-  A.`Inner Circle JHA Success`,
-  A.`Inner Circle JHA Gross`,
-  A.`Roadmap Success`,
-  A.`Roadmap Gross`,
-  A.`Roadmap JHA Success`,
-  A.`Roadmap JHA Gross`,
-  B.`Inner Circle Refunded`,
-  B.`Inner Circle Refund Amount`,
-  B.`Inner Circle JHA Refunded`,
-  B.`Inner Circle JHA Refund Amount`,
-  B.`Roadmap Refunded`,
-  B.`Roadmap Refund Amount`,
-  B.`Roadmap JHA Refunded`,
-  B.`Roadmap JHA Refund Amount`,
-  A.total_gross_USD,
-  B.total_refunds_USD,
-  A.total_gross_USD - B.total_refunds_USD AS net_sales_USD
+  SUM(A.`Inner Circle Success`),
+  SUM(A.`Inner Circle Gross`),
+  SUM(A.`Inner Circle JHA Success`),
+  SUM(A.`Inner Circle JHA Gross`),
+  SUM(A.`Roadmap Success`),
+  SUM(A.`Roadmap Gross`),
+  SUM(A.`Roadmap JHA Success`),
+  SUM(A.`Roadmap JHA Gross`),
+  SUM(B.`Inner Circle Refunded`),
+  SUM(B.`Inner Circle Refund Amount`),
+  SUM(B.`Inner Circle JHA Refunded`),
+  SUM(B.`Inner Circle JHA Refund Amount`),
+  SUM(B.`Roadmap Refunded`),
+  SUM(B.`Roadmap Refund Amount`),
+  SUM(B.`Roadmap JHA Refunded`),
+  SUM(B.`Roadmap JHA Refund Amount`),
+  SUM(A.total_gross_USD),
+  SUM(B.total_refunds_USD),
+  SUM(A.total_gross_USD - B.total_refunds_USD) AS net_sales_USD
 FROM
   (
     SELECT
@@ -126,6 +126,7 @@ FROM
     group by date(timestamp), membership_id
   ) as B
   ON A.date = B.date
+GROUP BY date
 ;
 
 
@@ -165,3 +166,74 @@ FROM
   on A.user_id_success = B.user_id_cancelled
 ORDER BY last_success
 ;
+
+
+
+
+/*
+----------------------------------------------------------------
+----------------------------------------------------------------
+*/
+
+(
+select
+/*date(timestamp) as "date",*/
+"Total" as name,
+count(distinct user_id) as users,
+count(id) as transactions,
+sum(case when status='success' then total else 0 end) as gross_sales,
+sum(case when status='cancelled' then total else 0 end) as refunded_amount,
+(sum(case when status='success' then total else 0 end)-sum(case when status='cancelled' then total else 0 end)) as net_sales,
+sum(case when status='cancelled' then 1 else 0 end) as refunds,
+sum(case when status='success' then 1 else 0 end) as active_users
+FROM wordpress.wp_pmpro_membership_orders
+/*##group by 1;*/
+)
+union
+(
+select
+/*date(timestamp) as "date",*/
+l.name,
+count(distinct user_id) as users,
+count(o.id) as transactions,
+sum(case when status='success' then total else 0 end) as gross_sales,
+sum(case when status='cancelled' then total else 0 end) as refunded_amount,
+(sum(case when status='success' then total else 0 end)-sum(case when status='cancelled' then total else 0 end)) as net_sales,
+sum(case when status='cancelled' then 1 else 0 end) as refunds,
+sum(case when status='success' then 1 else 0 end) as active_users
+FROM wordpress.wp_pmpro_membership_orders o
+join wordpress.wp_pmpro_membership_levels l
+on o.membership_id = l.id
+group by 1
+);
+(
+select
+date(timestamp) as "date",
+"Total" as name,
+count(distinct user_id) as users,
+count(id) as transactions,
+sum(case when status='success' then total else 0 end) as gross_sales,
+sum(case when status='cancelled' then total else 0 end) as refunded_amount,
+(sum(case when status='success' then total else 0 end)-sum(case when status='cancelled' then total else 0 end)) as net_sales,
+sum(case when status='cancelled' then 1 else 0 end) as refunds,
+sum(case when status='success' then 1 else 0 end) as active_users
+FROM wordpress.wp_pmpro_membership_orders
+group by 1,2
+)
+union
+(
+select
+date(timestamp) as "date",
+l.name,
+count(distinct user_id) as users,
+count(o.id) as transactions,
+sum(case when status='success' then total else 0 end) as gross_sales,
+sum(case when status='cancelled' then total else 0 end) as refunded_amount,
+(sum(case when status='success' then total else 0 end)-sum(case when status='cancelled' then total else 0 end)) as net_sales,
+sum(case when status='cancelled' then 1 else 0 end) as refunds,
+sum(case when status='success' then 1 else 0 end) as active_users
+FROM wordpress.wp_pmpro_membership_orders o
+join wordpress.wp_pmpro_membership_levels l
+on o.membership_id = l.id
+group by 1,2
+);
