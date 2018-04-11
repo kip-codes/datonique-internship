@@ -131,44 +131,6 @@ GROUP BY date
 
 
 
-SELECT
-#   COUNT(DISTINCT A.user_id) AS num_active
-  CASE
-    WHEN user_id_cancelled IS NULL
-      THEN user_id_success
-    ELSE  -- user_id_cancelled exists
-      CASE
-        WHEN last_success > last_refund
-          then user_id_success
-      END
-  END as user_id,
-  last_success
-FROM
-  (
-    SELECT
-      user_id AS user_id_success,
-      status,
-      max(timestamp) as last_success
-    FROM wp_pmpro_membership_orders
-    WHERE status like 'success'
-    GROUP BY user_id, status
-  ) AS A
-  LEFT JOIN
-  (
-    SELECT
-      user_id as user_id_cancelled,
-      status,
-      max(timestamp) as last_refund
-    FROM wp_pmpro_membership_orders
-    WHERE status like 'cancelled'
-    GROUP BY user_id, status
-  ) AS B
-  on A.user_id_success = B.user_id_cancelled
-ORDER BY last_success
-;
-
-
-
 
 /*
 ----------------------------------------------------------------
@@ -177,37 +139,6 @@ ORDER BY last_success
 
 (
 select
-/*date(timestamp) as "date",*/
-"Total" as name,
-count(distinct user_id) as users,
-count(id) as transactions,
-sum(case when status='success' then total else 0 end) as gross_sales,
-sum(case when status='cancelled' then total else 0 end) as refunded_amount,
-(sum(case when status='success' then total else 0 end)-sum(case when status='cancelled' then total else 0 end)) as net_sales,
-sum(case when status='cancelled' then 1 else 0 end) as refunds,
-sum(case when status='success' then 1 else 0 end) as active_users
-FROM wordpress.wp_pmpro_membership_orders
-/*##group by 1;*/
-)
-union
-(
-select
-/*date(timestamp) as "date",*/
-l.name,
-count(distinct user_id) as users,
-count(o.id) as transactions,
-sum(case when status='success' then total else 0 end) as gross_sales,
-sum(case when status='cancelled' then total else 0 end) as refunded_amount,
-(sum(case when status='success' then total else 0 end)-sum(case when status='cancelled' then total else 0 end)) as net_sales,
-sum(case when status='cancelled' then 1 else 0 end) as refunds,
-sum(case when status='success' then 1 else 0 end) as active_users
-FROM wordpress.wp_pmpro_membership_orders o
-join wordpress.wp_pmpro_membership_levels l
-on o.membership_id = l.id
-group by 1
-);
-(
-select
 date(timestamp) as "date",
 "Total" as name,
 count(distinct user_id) as users,
@@ -236,4 +167,37 @@ FROM wordpress.wp_pmpro_membership_orders o
 join wordpress.wp_pmpro_membership_levels l
 on o.membership_id = l.id
 group by 1,2
-);
+)
+;
+
+
+SELECT
+  COUNT(DISTINCT user_id) as users
+FROM wp_pmpro_membership_orders
+;
+
+-- Last day of activity
+SELECT DISTINCT
+  user_id,
+  status,
+  MAX(timestamp) as last_activity
+FROM wp_pmpro_membership_orders
+GROUP BY user_id, status
+;
+
+
+-- Extract active users
+SELECT
+  date(last_activity),
+  COUNT(user_id) as active_users
+FROM (
+  SELECT DISTINCT
+  user_id,
+  status,
+  MAX(timestamp) as last_activity
+FROM wp_pmpro_membership_orders
+GROUP BY user_id, status
+) as A
+WHERE status like 'success'
+GROUP BY date(last_activity)
+;
