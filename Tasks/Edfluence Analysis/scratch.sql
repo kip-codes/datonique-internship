@@ -266,3 +266,9 @@ ORDER BY date
 
 SELECT *
 FROM wp_pmpro_memberships_users;
+
+
+select user_id, status, total
+FROM wp_pmpro_membership_orders
+WHERE user_id = 6408
+;

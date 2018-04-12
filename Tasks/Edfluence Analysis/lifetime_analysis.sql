@@ -201,3 +201,38 @@ GROUP BY user_id, status
 WHERE status like 'success'
 GROUP BY date(last_activity)
 ;
+
+
+
+-- LIFETIME METRICS
+(
+select
+/*date(timestamp) as "date",*/
+"Total" as name,
+count(distinct user_id) as users,
+count(id) as transactions,
+sum(case when status='success' then total else 0 end) as gross_sales,
+sum(case when status='cancelled' then total else 0 end) as refunded_amount,
+(sum(case when status='success' then total else 0 end)-sum(case when status='cancelled' then total else 0 end)) as net_sales,
+sum(case when status='cancelled' then 1 else 0 end) as refunds,
+sum(case when status='success' then 1 else 0 end) as active_users
+FROM wordpress.wp_pmpro_membership_orders
+/*##group by 1;*/
+)
+union
+(
+select
+/*date(timestamp) as "date",*/
+l.name,
+count(distinct user_id) as users,
+count(o.id) as transactions,
+sum(case when status='success' then total else 0 end) as gross_sales,
+sum(case when status='cancelled' then total else 0 end) as refunded_amount,
+(sum(case when status='success' then total else 0 end)-sum(case when status='cancelled' then total else 0 end)) as net_sales,
+sum(case when status='cancelled' then 1 else 0 end) as refunds,
+sum(case when status='success' then 1 else 0 end) as active_users
+FROM wordpress.wp_pmpro_membership_orders o
+join wordpress.wp_pmpro_membership_levels l
+on o.membership_id = l.id
+group by 1
+)

@@ -53,9 +53,9 @@ FROM
 (
   SELECT
     sub_A1.month,
-    COUNT(distinct sub_A1.customer_id) AS total_customers,
-    COUNT(distinct sub_A2.order_number) as total_orders,
-    SUM(sub_A2.total_sales) as total_sales
+    COUNT(distinct customer_id) AS total_customers,
+    COUNT(distinct sub_a1.order_number) as total_orders,
+    SUM(total_sales) as total_sales
   FROM
     (
       SELECT
