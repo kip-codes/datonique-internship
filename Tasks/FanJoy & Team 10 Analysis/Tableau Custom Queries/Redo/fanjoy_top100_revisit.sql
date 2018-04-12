@@ -88,8 +88,8 @@ FROM
         id,
         initcap(first_name) + ' ' + initcap(last_name) AS name,
         email,
-        country,
-        city
+        initcap(country) as country,
+        initcap(city) as city
       FROM fanjoy_customers_data
     ) AS B
       ON A.customer_id = B.id
@@ -103,7 +103,12 @@ FROM
     ) AS C
       ON A.order_number = C.order_number
   )
-WHERE customer_id IS NOT NULL and customer_id > 0 AND email IS NOT NULL
+WHERE
+    customer_id IS NOT NULL
+    AND customer_id > 0
+    AND email IS NOT NULL
+    AND country IS NOT NULL
+    AND city IS NOT NULL
 GROUP BY id, name, email, country, city
 ORDER BY "Total Sales" DESC
 LIMIT 100
@@ -133,8 +138,8 @@ FROM
         id,
         initcap(first_name) + ' ' + initcap(last_name) AS name,
         email,
-        country,
-        city
+        initcap(country) as country,
+        initcap(city) as city
       FROM fanjoy_customers_data
     ) AS B
       ON A.customer_id = B.id
@@ -148,7 +153,12 @@ FROM
     ) AS C
       ON A.order_number = C.order_number
   )
-WHERE customer_id IS NOT NULL and customer_id > 0 AND email IS NOT NULL
+WHERE
+    customer_id IS NOT NULL
+    AND customer_id > 0
+    AND email IS NOT NULL
+    AND country IS NOT NULL
+    AND city IS NOT NULL
 GROUP BY id, name, email, country, city
 ORDER BY "Total Sales" DESC
 LIMIT 100
@@ -178,8 +188,8 @@ FROM
         id,
         initcap(first_name) + ' ' + initcap(last_name) AS name,
         email,
-        country,
-        city
+        initcap(country) as country,
+        initcap(city) as city
       FROM fanjoy_customers_data
     ) AS B
       ON A.customer_id = B.id
@@ -196,7 +206,12 @@ FROM
     ) AS C
       ON A.order_number = C.order_number
   )
-WHERE customer_id IS NOT NULL and customer_id > 0 AND email IS NOT NULL
+WHERE
+    customer_id IS NOT NULL
+    AND customer_id > 0
+    AND email IS NOT NULL
+    AND country IS NOT NULL
+    AND city IS NOT NULL
 GROUP BY id, name, email, country, city
 ORDER BY "Total Sales" DESC
 LIMIT 100
@@ -227,8 +242,8 @@ FROM
         id,
         initcap(first_name) + ' ' + initcap(last_name) AS name,
         email,
-        country,
-        city
+        initcap(country) as country,
+        initcap(city) as city
       FROM fanjoy_customers_data
     ) AS B
       ON A.customer_id = B.id
@@ -245,7 +260,12 @@ FROM
     ) AS C
       ON A.order_number = C.order_number
   )
-WHERE customer_id IS NOT NULL and customer_id > 0 AND email IS NOT NULL
+WHERE
+    customer_id IS NOT NULL
+    AND customer_id > 0
+    AND email IS NOT NULL
+    AND country IS NOT NULL
+    AND city IS NOT NULL
 GROUP BY id, name, email, country, city
 ORDER BY "Total Sales" DESC
 LIMIT 100
@@ -276,8 +296,8 @@ FROM
         id,
         initcap(first_name) + ' ' + initcap(last_name) AS name,
         email,
-        country,
-        city
+        initcap(country) as country,
+        initcap(city) as city
       FROM fanjoy_customers_data
     ) AS B
       ON A.customer_id = B.id
@@ -294,7 +314,12 @@ FROM
     ) AS C
       ON A.order_number = C.order_number
   )
-WHERE customer_id IS NOT NULL and customer_id > 0 AND email IS NOT NULL
+WHERE
+    customer_id IS NOT NULL
+    AND customer_id > 0
+    AND email IS NOT NULL
+    AND country IS NOT NULL
+    AND city IS NOT NULL
 GROUP BY id, name, email, country, city
 ORDER BY "Total Sales" DESC
 LIMIT 100
@@ -325,8 +350,8 @@ FROM
         id,
         initcap(first_name) + ' ' + initcap(last_name) AS name,
         email,
-        country,
-        city
+        initcap(country) as country,
+        initcap(city) as city
       FROM fanjoy_customers_data
     ) AS B
       ON A.customer_id = B.id
@@ -343,7 +368,12 @@ FROM
     ) AS C
       ON A.order_number = C.order_number
   )
-WHERE customer_id IS NOT NULL and customer_id > 0 AND email IS NOT NULL
+WHERE
+    customer_id IS NOT NULL
+    AND customer_id > 0
+    AND email IS NOT NULL
+    AND country IS NOT NULL
+    AND city IS NOT NULL
 GROUP BY id, name, email, country, city
 ORDER BY "Total Sales" DESC
 LIMIT 100
