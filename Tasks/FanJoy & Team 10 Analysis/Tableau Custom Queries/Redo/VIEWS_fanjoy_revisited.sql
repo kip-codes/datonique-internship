@@ -1,3 +1,160 @@
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+/*
+
+  BASE VIEWS FOR LINE ITEMS AND ORDERS
+
+ */
+
+
+
+-- View of all Team 10 line items
+CREATE VIEW kevin_ip.fld_team10 AS
+  (
+    SELECT *
+    FROM fanjoy_lineitems_data fld
+    WHERE (lower(fld.title) like '%erika%'
+      or lower(fld.title) like '%team%10%'
+      or fld.title ILIKE '%team%ten%'
+      or lower(fld.title) like '%chance%&%anthony%'
+      or lower(fld.title) like '%nick%crompton%'
+      or lower(fld.title) like '%jake%paul%'
+      or lower(fld.title) like '%ben%hampton%'
+      or lower(fld.name) like '%erika%'
+      or lower(fld.name) like '%team%10%'
+      or fld.name ilike '%team%ten%'
+      or lower(fld.name) like '%chance%&%anthony%'
+      or lower(fld.name) like '%nick%crompton%'
+      or lower(fld.name) like '%jake%paul%'
+      or lower(fld.name) like '%ben%hampton%'
+      or lower(fld.vendor) like '%jake%paul%'
+      or lower(fld.vendor) like '%team%10%'
+      or fld.vendor ilike '%team%ten%')
+  );
+
+-- View of all orders placed containing Team 10 line items
+CREATE VIEW kevin_ip.fod_team10 AS
+  (
+    SELECT fod.*
+    FROM fanjoy_orders_data fod
+    WHERE fod.order_number IN
+          (
+            SELECT DISTINCT fld_team10.order_number
+            FROM kevin_ip.fld_team10
+          )
+  );
+
+
+
+-- View of all customers linked to orders placed containing Team 10 line items
+CREATE VIEW kevin_ip.fcd_team10 AS
+  (
+      SELECT fcd.*
+      FROM fanjoy_customers_data fcd
+      WHERE fcd.id IN
+            (
+              SELECT distinct fod_team10.customer_id
+              FROM kevin_ip.fod_team10
+            )
+  );
+
+
+
+-- View of all Jake line items
+CREATE VIEW kevin_ip.fld_jakepaul AS
+  (
+    SELECT *
+    FROM fanjoy_lineitems_data fld
+    WHERE
+      (
+        lower(fld.title) like '%jake%paul%'
+        or lower(fld.name) like '%jake%paul%'
+        or lower(fld.vendor) like '%jake%paul%'
+      )
+  )
+;
+
+
+-- View of all orders placed containing Jake line items
+CREATE VIEW kevin_ip.fod_jakepaul AS
+  (
+    SELECT fod.*
+    FROM fanjoy_orders_data fod
+    WHERE fod.order_number IN
+          (
+            SELECT DISTINCT fld.order_number
+            FROM kevin_ip.fld_jakepaul fld
+          )
+  )
+;
+
+
+-- View of all Team 10, no Jake line items
+CREATE VIEW kevin_ip.fld_team10_nojake AS
+  (
+    SELECT *
+    FROM fanjoy_lineitems_data fld
+    WHERE
+          (
+            lower(fld.title) like '%erika%'
+            or lower(fld.title) like '%team%10%'
+            or fld.title ilike '%team%ten%'
+            or lower(fld.title) like '%chance%&%anthony%'
+            or lower(fld.title) like '%nick%crompton%'
+            or lower(fld.title) like '%ben%hampton%'
+            or lower(fld.name) like '%erika%'
+            or lower(fld.name) like '%team%10%'
+            or fld.name ilike '%team%ten%'
+            or lower(fld.name) like '%chance%&%anthony%'
+            or lower(fld.name) like '%nick%crompton%'
+            or lower(fld.name) like '%ben%hampton%'
+            or lower(fld.vendor) like '%team%10%'
+            or fld.vendor ilike '%team%ten%'
+          )
+          AND
+          (
+            lower(fld.name) NOT LIKE '%jake%paul%'
+            AND lower(fld.title) NOT LIKE '%jake%paul%'
+            AND lower(fld.vendor) NOT LIKE '%jake%paul%'
+          )
+  )
+;
+
+
+
+-- View of all orders placed containing Team 10, no Jake line items
+CREATE VIEW kevin_ip.fod_team10_nojake AS
+  (
+    SELECT fod.*
+    FROM fanjoy_orders_data fod
+    WHERE fod.order_number IN
+          (
+            SELECT DISTINCT order_number
+            FROM kevin_ip.fld_team10_nojake
+          )
+  )
+;
+
+
+----------------------------------------------------------------
+----------------------------------------------------------------
+/*
+
+  FIRST ORDERS FOR ALL OF FANJOY
+  No need for seperate views for subset, use entire Fanjoy set
+
+ */
+
+CREATE VIEW kevin_ip.first_orders_fanjoy AS (
+  SELECT DISTINCT
+    customer_id,
+    MIN(date_trunc('month', created_at)) AS first_order_month
+  FROM fanjoy_orders_data
+  WHERE customer_id > 0 and customer_id IS NOT NULL
+  GROUP BY customer_id
+  ORDER BY customer_id
+);
+
 
 /*
   Use Custom SQL Queries within Tableau Workbook for these views to keep separate from previous version of .twbx
