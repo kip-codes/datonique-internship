@@ -35,14 +35,19 @@ CREATE VIEW kevin_ip.qtr_sales_fanjoy AS
       (
         SELECT DISTINCT
           id,
-          country,
-          city
+          initcap(trim(country)) as country,
+          initcap(trim(city)) as city
         FROM fanjoy_customers_data
+        WHERE
+          country IS NOT NULL
+          AND city IS NOT NULL
       ) AS C
         ON A.customer_ID = C.id
     GROUP BY 1, 2, 3, 4
-    ORDER BY year, qtr
+    ORDER BY country, city, year, qtr
 );
+
+
 
 -- Team 10
 -- Pull from all Fanjoy orders if fod does not capture
@@ -75,9 +80,12 @@ CREATE VIEW kevin_ip.qtr_sales_team10 AS
       (
         SELECT DISTINCT
           id,
-          country,
-          city
+          initcap(trim(country)) as country,
+          initcap(trim(city)) as city
         FROM fanjoy_customers_data
+        WHERE
+          country IS NOT NULL
+          AND city IS NOT NULL
       ) AS C
         ON A.customer_ID = C.id
     GROUP BY 1, 2, 3, 4
@@ -116,9 +124,12 @@ CREATE VIEW kevin_ip.qtr_sales_jake AS
       (
         SELECT DISTINCT
           id,
-          country,
-          city
+          initcap(trim(country)) as country,
+          initcap(trim(city)) as city
         FROM fanjoy_customers_data
+        WHERE
+          country IS NOT NULL
+          AND city IS NOT NULL
       ) AS C
         ON A.customer_ID = C.id
     GROUP BY 1, 2, 3, 4
