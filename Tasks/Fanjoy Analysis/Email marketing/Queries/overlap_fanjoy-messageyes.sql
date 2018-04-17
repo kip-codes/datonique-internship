@@ -4,18 +4,10 @@ WHERE price > 0
 ;
 
 
-
-
 -- Get Fanjoy and messageyes Overlap
 -- Get Fanjoy customers that have placed orders
 SELECT DISTINCT
---   customer_id,
   regexp_replace(phone, '[^0-9]+', '') as phone
---   lower(email) as email,
---   sum(sales) as total_spent
---   COUNT(distinct lower(email))
---   lower(email) as email
-
 FROM
   (
     SELECT DISTINCT
@@ -44,4 +36,13 @@ FROM
     FROM fanjoy_customers_data
   ) AS C
   on a.customer_id = c.id
+;
 
+
+SELECT DISTINCT regexp_replace(phone, '[^0-9]+', '') as phone
+FROM fanjoy_customers_data
+WHERE total_spent > 0
+ and regexp_replace(phone, '[^0-9]+', '') in (
+ 0
+)
+;

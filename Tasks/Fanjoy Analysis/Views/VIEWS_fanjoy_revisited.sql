@@ -13,18 +13,18 @@
  */
 
 -- Drop dependent views
-DROP VIEW kevin_ip.first_orders_fanjoy;
-DROP VIEW kevin_ip.qtr_sales_fanjoy;
-DROP VIEW kevin_ip.qtr_sales_jake;
-DROP VIEW kevin_ip.qtr_sales_team10;
+DROP VIEW IF EXISTS kevin_ip.first_orders_fanjoy;
+DROP VIEW IF EXISTS kevin_ip.qtr_sales_fanjoy;
+DROP VIEW IF EXISTS kevin_ip.qtr_sales_jake;
+DROP VIEW IF EXISTS kevin_ip.qtr_sales_team10;
 
 -- Drop base views
-DROP VIEW kevin_ip.fod_jakepaul;
-DROP VIEW kevin_ip.fod_team10;
-DROP VIEW kevin_ip.fod_team10_nojake;
-DROP VIEW kevin_ip.fld_jakepaul;
-DROP VIEW kevin_ip.fld_team10;
-DROP VIEW kevin_ip.fld_team10_nojake;
+DROP VIEW IF EXISTS kevin_ip.fod_jakepaul;
+DROP VIEW IF EXISTS kevin_ip.fod_team10;
+DROP VIEW IF EXISTS kevin_ip.fod_team10_nojake;
+DROP VIEW IF EXISTS kevin_ip.fld_jakepaul;
+DROP VIEW IF EXISTS kevin_ip.fld_team10;
+DROP VIEW IF EXISTS kevin_ip.fld_team10_nojake;
 
 
 --------------------------------------------------------------------
@@ -237,14 +237,14 @@ CREATE VIEW kevin_ip.qtr_sales_team10 AS
           order_number,
           created_at AS date,
           customer_id
-        FROM fod_team10
+        FROM kevin_ip.fod_team10
       ) AS A
       JOIN
       (
         SELECT
           order_number,
           SUM(price) AS sales
-        FROM fld_team10
+        FROM kevin_ip.fld_team10
         GROUP BY order_number
       ) AS B
         ON A.order_number = B.order_number
@@ -281,14 +281,14 @@ CREATE VIEW kevin_ip.qtr_sales_jake AS
           order_number,
           created_at AS date,
           customer_id
-        FROM fod_jakepaul
+        FROM kevin_ip.fod_jakepaul
       ) AS A
       JOIN
       (
         SELECT
           order_number,
           SUM(price) AS sales
-        FROM fld_jakepaul
+        FROM kevin_ip.fld_jakepaul
         GROUP BY order_number
       ) AS B
         ON A.order_number = B.order_number

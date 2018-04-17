@@ -30,6 +30,7 @@ FROM
       order_number,
       sum(price) as sales
     FROM fanjoy_lineitems_data
+    WHERE sum(price) > 0
     GROUP BY order_number
   ) as B
   ON a.order_number = b.order_number
@@ -41,4 +42,22 @@ FROM
     FROM fanjoy_customers_data
   ) AS C
   on a.customer_id = c.id
-WHERE lower(email) IN
+WHERE lower(email) IN (
+  0
+)
+;
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+SELECT DISTINCT lower(email)
+FROM fanjoy_customers_data
+WHERE
+  total_spent > 0
+  and lower(email) in (
+    0
+  )
+;
+
+SELECT COUNT(distinct email) FROM fanjoy_customers_data
+where total_spent > 0;
