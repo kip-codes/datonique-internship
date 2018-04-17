@@ -1,11 +1,37 @@
+/*
+  List of Views Created:
+    fld_jakepaul
+    fld_team10
+    fld_team10_nojake
+    fod_jakepaul
+    fod_team10
+    fod_team10_nojake
+    first_orders_fanjoy
+    qtr_sales_fanjoy
+    qtr_sales_jake
+    qtr_sales_team10
+ */
+
+-- Drop dependent views
+DROP VIEW kevin_ip.first_orders_fanjoy;
+DROP VIEW kevin_ip.qtr_sales_fanjoy;
+DROP VIEW kevin_ip.qtr_sales_jake;
+DROP VIEW kevin_ip.qtr_sales_team10;
+
+-- Drop base views
+DROP VIEW kevin_ip.fod_jakepaul;
+DROP VIEW kevin_ip.fod_team10;
+DROP VIEW kevin_ip.fod_team10_nojake;
+DROP VIEW kevin_ip.fld_jakepaul;
+DROP VIEW kevin_ip.fld_team10;
+DROP VIEW kevin_ip.fld_team10_nojake;
+
+
 --------------------------------------------------------------------
 --------------------------------------------------------------------
 /*
-
   BASE VIEWS FOR LINE ITEMS AND ORDERS
-
  */
-
 
 
 -- View of all Team 10 line items
@@ -43,21 +69,6 @@ CREATE VIEW kevin_ip.fod_team10 AS
             FROM kevin_ip.fld_team10
           )
   );
-
-
-
--- View of all customers linked to orders placed containing Team 10 line items
-CREATE VIEW kevin_ip.fcd_team10 AS
-  (
-      SELECT fcd.*
-      FROM fanjoy_customers_data fcd
-      WHERE fcd.id IN
-            (
-              SELECT distinct fod_team10.customer_id
-              FROM kevin_ip.fod_team10
-            )
-  );
-
 
 
 -- View of all Jake line items
@@ -139,10 +150,8 @@ CREATE VIEW kevin_ip.fod_team10_nojake AS
 ----------------------------------------------------------------
 ----------------------------------------------------------------
 /*
-
   FIRST ORDERS FOR ALL OF FANJOY
   No need for seperate views for subset, use entire Fanjoy set
-
  */
 
 CREATE VIEW kevin_ip.first_orders_fanjoy AS (
