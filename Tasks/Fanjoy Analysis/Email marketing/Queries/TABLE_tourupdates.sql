@@ -23,10 +23,6 @@ CSV DELIMITER ',' IGNOREHEADER 1
 ;
 
 
--- ACCESS_KEY_ID 'AKIAIZG5DHLMMST6DBWQ'
--- SECRET_ACCESS_KEY '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'
-
-
 
 SELECT count(*)
 FROM kevin_ip.jakepaul_tourupdates;
