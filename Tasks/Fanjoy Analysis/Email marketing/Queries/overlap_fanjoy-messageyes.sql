@@ -9,6 +9,7 @@ WHERE price > 0
 SELECT DISTINCT
   regexp_replace(phone, '[^0-9]+', '') as phone
 FROM
+  -- Paying customers
   (
     SELECT DISTINCT
       customer_id,
@@ -26,6 +27,7 @@ FROM
       sum(price) as sales
     FROM fanjoy_lineitems_data
     GROUP BY order_number
+    HAVING sum(price) > 0
   ) as B
   ON a.order_number = b.order_number
   JOIN
@@ -36,6 +38,11 @@ FROM
     FROM fanjoy_customers_data
   ) AS C
   on a.customer_id = c.id
+WHERE regexp_replace(phone, '[^0-9]+', '') IN (
+  SELECT DISTINCT phone_number
+  FROM kevin_ip.jakepaul_optin
+  WHERE opted_in = 1
+)
 ;
 
 
@@ -43,6 +50,8 @@ SELECT DISTINCT regexp_replace(phone, '[^0-9]+', '') as phone
 FROM fanjoy_customers_data
 WHERE total_spent > 0
  and regexp_replace(phone, '[^0-9]+', '') in (
- 0
+   SELECT DISTINCT phone_number
+    FROM kevin_ip.jakepaul_optin
+    WHERE opted_in = 1
 )
 ;
