@@ -1,8 +1,9 @@
 -- Get emails for active users
 select
-  id as userID,
-  user_email as email,
-  membership_id as membership_level
+#   id as userID,
+#   DISTINCT lower(user_email) as email
+  COUNT(DISTINCT lower(user_email))
+#   membership_id as membership_level
 from wp_users
 join
   (
@@ -15,3 +16,4 @@ join
   ) AS A
 ON wp_users.id = A.user_id
 ;
+

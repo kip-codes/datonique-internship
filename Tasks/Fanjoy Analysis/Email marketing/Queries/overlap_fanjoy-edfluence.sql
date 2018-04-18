@@ -1,8 +1,3 @@
-select count(distinct(order_number))
-from fanjoy_lineitems_data
-WHERE price > 0
-;
-
 
 -- Get Fanjoy and Edfluence Overlap
 -- Get Fanjoy customers that have placed orders
@@ -30,8 +25,8 @@ FROM
       order_number,
       sum(price) as sales
     FROM fanjoy_lineitems_data
-    WHERE sum(price) > 0
     GROUP BY order_number
+    HAVING sum(price) > 0
   ) as B
   ON a.order_number = b.order_number
   JOIN
@@ -58,6 +53,3 @@ WHERE
     0
   )
 ;
-
-SELECT COUNT(distinct email) FROM fanjoy_customers_data
-where total_spent > 0;
