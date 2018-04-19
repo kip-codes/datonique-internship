@@ -13,7 +13,7 @@ CREATE TABLE kevin_ip.jakepaul_optin
 
 COPY kevin_ip.jakepaul_optin
 FROM 's3://kevin-ip-test/jp_initial_csv_dump-user-level-details-73a8c78cdef7-2018-02-13-19-21-37.csv'
-CREDENTIALS 'aws_access_key_id=AKIAIZG5DHLMMST6DBWQ;aws_secret_access_key=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'
+CREDENTIALS ''
 IGNOREHEADER 1
 CSV DELIMITER ','
 ;

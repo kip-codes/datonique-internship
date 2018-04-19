@@ -47,3 +47,8 @@ SELECT count(distinct phone_number)
 FROM kevin_ip.jakepaul_optin
 WHERE opted_in = 1
 ;
+
+
+SELECT DISTINCT date_trunc('day', date::date)
+FROM kevin_ip.jakepaul_tourupdates
+ORDER BY date DESC;
