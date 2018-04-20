@@ -52,3 +52,28 @@ WHERE opted_in = 1
 SELECT DISTINCT date_trunc('day', date::date)
 FROM kevin_ip.jakepaul_tourupdates
 ORDER BY date DESC;
+
+
+SELECT
+  COUNT(distinct customer_id)
+FROM
+  (
+    SELECT distinct
+      customer_id,
+      order_number,
+      lower(customer_email) as customer_email
+    FROM fanjoy_orders_data
+    WHERE
+      customer_email NOT ILIKE '%fanjoy.co%'
+  ) A
+  JOIN
+  (
+    SELECT distinct
+      order_number,
+      sum(price) as total_sales
+    FROM kevin_ip.fld_jakepaul
+    GROUP BY order_number
+  ) B
+  ON A.order_number = B.order_number
+WHERE B.total_sales > 0
+;
