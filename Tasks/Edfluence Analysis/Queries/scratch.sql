@@ -266,6 +266,7 @@ ORDER BY date
 
 SELECT *
 FROM wp_pmpro_memberships_users
+LIMIT 5
 ;
 
 SELECT *
@@ -278,3 +279,196 @@ WHERE user_id = 6408
 ;
 
 
+SELECT *
+FROM wp_users
+LIMIT 5
+;
+
+SELECT *
+FROM wp_pmpro_membership_orders
+LIMIT 5
+;
+
+
+CREATE TABLE wordpress.plans_old
+(
+  id INT(10) UNSIGNED AUTO_INCREMENT,
+  plan_id VARCHAR(255),
+  course_id INT(11),
+  name VARCHAR(255),
+  amount DECIMAL(8,2),
+  recurring TINYINT(1),
+  interv VARCHAR(255),
+  interval_count INT(11),
+  created_at TIMESTAMP NULL,
+  updated_at TIMESTAMP NULL,
+  deleted_at TIMESTAMP NULL,
+  PRIMARY KEY (id)
+);
+
+
+CREATE TABLE wordpress.transactions_old
+(
+  id INT(10) UNSIGNED AUTO_INCREMENT,
+  user_id int(11),
+  course_id int(11),
+  plan_id int(11),
+  interv varchar(255),
+  interval_count int(11),
+  subscription_id int(11),
+  transaction_id varchar(255),
+  amount decimal(8,2),
+  is_refunded tinyint(1),
+  amount_refunded DECIMAL(8,2),
+  refund_processor int(11),
+  refund_reason VARCHAR(255),
+  refund_status VARCHAR(255),
+  refund_date datetime,
+  source_id VARCHAR(255),
+  source_object VARCHAR(255),
+  source_brand VARCHAR(255),
+  source_country VARCHAR(255),
+  source_exp_month varchar(255),
+  source_exp_year VARCHAR(255),
+  source_funding varchar(255),
+  source_last4 VARCHAR(255),
+  status VARCHAR(255),
+  created_at timestamp NULL,
+  updated_at timestamp NULL,
+  deleted_at timestamp NULL,
+  PRIMARY KEY (id)
+);
+
+
+CREATE TABLE wordpress.users_old
+(
+  id int(10) unsigned AUTO_INCREMENT,
+  first_name VARCHAR(255),
+  last_name VARCHAR(255),
+  address VARCHAR(255),
+  city VARCHAR(255),
+  state varchar(255),
+  zip VARCHAR(255),
+  country VARCHAR(255),
+  email VARCHAR(255),
+  facebook_id VARCHAR(255),
+  facebook_token VARCHAR(255),
+  profile_pic VARCHAR(255),
+  is_admin tinyint(1),
+  is_creator tinyint(1),
+  is_affiliate tinyint(1),
+  is_suspended tinyint(1),
+  password VARCHAR(255),
+  api_token VARCHAR(60),
+  remember_token VARCHAR(100),
+  affiliate_code VARCHAR(255),
+  referral_code VARCHAR(255),
+  w9 TINYINT(1),
+  suspension_reason text,
+  stripe_id VARCHAR(255),
+  card_brand VARCHAR(255),
+  card_last_four VARCHAR(255),
+  trial_ends_at timestamp null,
+  created_at timestamp null,
+  updated_at timestamp null,
+  deleted_at timestamp null,
+  has_forum tinyint(1),
+  PRIMARY KEY (id)
+);
+
+
+LOAD DATA LOCAL INFILE '/Users/kevinip/Documents/POST GRAD/TEMP : INTERNSHIPS/Datonique/Tasks/Old Edfluence Analysis/Data Extracts/edflu_plans.csv'
+INTO TABLE wordpress.plans_old
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+;
+
+
+select *
+FROM plans_old;
+
+
+LOAD DATA LOCAL INFILE '/Users/kevinip/Documents/POST GRAD/TEMP : INTERNSHIPS/Datonique/Tasks/Old Edfluence Analysis/Data Extracts/edflu_transactions.csv'
+INTO TABLE wordpress.transactions_old
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+;
+
+
+SELECT *
+FROM transactions_old;
+
+
+LOAD DATA LOCAL INFILE '/Users/kevinip/Documents/POST GRAD/TEMP : INTERNSHIPS/Datonique/Tasks/Old Edfluence Analysis/Data Extracts/edflu_users.csv'
+INTO TABLE wordpress.users_old
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+;
+
+
+SELECT *
+FROM users_old;
+
+
+
+CREATE TABLE wordpress.payments_stripe
+(
+  id VARCHAR(255),
+  description VARCHAR(255),
+  created_utc timestamp NULL,
+  amount DECIMAL(8,2),
+  amount_refunded DECIMAL(8,2),
+  currency VARCHAR(10),
+  converted_amt DECIMAL(8,2),
+  converted_amt_refunded DECIMAL(8,2),
+  fee DECIMAL(8,2),
+  tax DECIMAL(8,2),
+  converted_currency VARCHAR(10),
+  mode VARCHAR(30),
+  status VARCHAR(30),
+  statement_descriptor VARCHAR(255),
+  customer_id VARCHAR(255),
+  customer_description VARCHAR(255),
+  customer_email VARCHAR(255),
+  captured VARCHAR(30),
+  card_id VARCHAR(255),
+  card_last4 int(10),
+  card_brand VARCHAR(30),
+  card_exp_month int(2),
+  card_exp_year int(5),
+  card_name VARCHAR(255),
+  card_address_line1 VARCHAR(255),
+  card_address_line2 VARCHAR(255),
+  card_address_city VARCHAR(255),
+  card_address_state VARCHAR(255),
+  card_address_country VARCHAR(255),
+  card_address_zip VARCHAR(255),
+  card_issue_country VARCHAR(30),
+  card_fingerprint VARCHAR(255),
+  card_cvc_status VARCHAR(30),
+  card_avs_zip_status VARCHAR(255),
+  card_avs_line1_status VARCHAR(255),
+  card_tokenization_method VARCHAR(255),
+  disputed_amt DECIMAL(8,2),
+  dispute_status VARCHAR(255),
+  dispute_reason VARCHAR(255),
+  dispute_date_utc timestamp null,
+  dispute_evidence_due_utc timestamp null,
+  invoice_id VARCHAR(255),
+  payment_source_type VARCHAR(30),
+  destination VARCHAR(255),
+  transfer VARCHAR(255),
+  transfer_group VARCHAR(255)
+);
+
+
+
+LOAD DATA LOCAL INFILE '/Users/kevinip/Documents/POST GRAD/TEMP : INTERNSHIPS/Datonique/Tasks/Old Edfluence Analysis/Data Extracts/payments.csv'
+INTO TABLE wordpress.payments_stripe
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+;
+
+select count(distinct customer_id)
+FROM payments_stripe;
