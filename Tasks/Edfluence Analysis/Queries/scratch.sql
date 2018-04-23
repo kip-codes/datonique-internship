@@ -472,3 +472,45 @@ IGNORE 1 LINES
 
 select count(distinct customer_id)
 FROM payments_stripe;
+
+
+CREATE TABLE wordpress.subscriptions_old
+(
+  id int(10) unsigned AUTO_INCREMENT,
+  user_id int(11),
+  plan_id int(11),
+  course_id int(11),
+  name VARCHAR(255),
+  stripe_id VARCHAR(255),
+  stripe_plan VARCHAR(255),
+  quantity int(11),
+  trial_ends_at timestamp null,
+  ends_at timestamp null,
+  created_at timestamp null,
+  updated_at timestamp null,
+  deleted_at timestamp null,
+  is_refunded smallint(6),
+  PRIMARY KEY (id)
+);
+
+LOAD DATA LOCAL INFILE '/Users/kevinip/Documents/POST GRAD/TEMP : INTERNSHIPS/Datonique/Tasks/Old Edfluence Analysis/Data Extracts/edflu_subscriptions.csv'
+INTO TABLE wordpress.subscriptions_old
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+;
+
+select DISTINCT plan_id from subscriptions_old;
+
+select * from plans_old;
+
+SELECT count(*)
+FROM subscriptions_old
+WHERE plan_id != 1 and plan_id != 2 and plan_id != 6 and plan_id != 0
+  AND is_refunded = 1;
+
+
+SELECT * from subscriptions_old;
+
+SELECT * from users_old;
+
+
