@@ -415,7 +415,7 @@ CREATE TABLE wordpress.payments_stripe
 (
   id VARCHAR(255),
   description VARCHAR(255),
-  created_utc timestamp NULL,
+  created_utc TIMESTAMP NULL,
   amount DECIMAL(8,2),
   amount_refunded DECIMAL(8,2),
   currency VARCHAR(10),
@@ -452,22 +452,22 @@ CREATE TABLE wordpress.payments_stripe
   disputed_amt DECIMAL(8,2),
   dispute_status VARCHAR(255),
   dispute_reason VARCHAR(255),
-  dispute_date_utc timestamp null,
-  dispute_evidence_due_utc timestamp null,
+  dispute_date_utc TIMESTAMP null,
+  dispute_evidence_due_utc TIMESTAMP null,
   invoice_id VARCHAR(255),
   payment_source_type VARCHAR(30),
   destination VARCHAR(255),
   transfer VARCHAR(255),
-  transfer_group VARCHAR(255)
+  transfer_group VARCHAR(255),
+  PRIMARY KEY (id)
 );
 
 
 
-LOAD DATA LOCAL INFILE '/Users/kevinip/Documents/POST GRAD/TEMP : INTERNSHIPS/Datonique/Tasks/Old Edfluence Analysis/Data Extracts/payments.csv'
+LOAD DATA LOCAL INFILE '/Users/kevinip/Documents/POST GRAD/TEMP : INTERNSHIPS/Datonique/Tasks/Old Edfluence Analysis/Data Extracts/payments_noheader.csv'
 INTO TABLE wordpress.payments_stripe
 FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\n'
-IGNORE 1 LINES
 ;
 
 select count(distinct customer_id)
@@ -512,5 +512,9 @@ WHERE plan_id != 1 and plan_id != 2 and plan_id != 6 and plan_id != 0
 SELECT * from subscriptions_old;
 
 SELECT * from users_old;
+
+SELECT * from payments_stripe;
+
+SELECT * FROM subscription_data_old;
 
 

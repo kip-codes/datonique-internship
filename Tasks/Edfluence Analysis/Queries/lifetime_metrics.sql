@@ -117,3 +117,4 @@ join wordpress.wp_pmpro_membership_levels l
 on o.membership_id = l.id
 group by 1
 )
+

@@ -13,3 +13,4 @@ LIMIT 10;
 
 select count(distinct id)
 FROM users;
+
