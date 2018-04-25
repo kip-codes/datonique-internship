@@ -47,6 +47,8 @@ WHERE date(timestamp) = '2018-02-04'
 
 SELECT * FROM wp_pmpro_membership_orders;
 
+SELECT * from wp_pmpro_membership_orders where status = 'refunded';
+
 
 /*
   Total Buyers
@@ -434,6 +436,7 @@ CREATE TABLE wordpress.payments_stripe
   card_id VARCHAR(255),
   card_last4 int(10),
   card_brand VARCHAR(30),
+  card_funding VARCHAR(30),
   card_exp_month int(2),
   card_exp_year int(5),
   card_name VARCHAR(255),

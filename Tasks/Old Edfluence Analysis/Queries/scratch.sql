@@ -9,7 +9,7 @@ LIMIT 10;
 
 SELECT *
 FROM users
-LIMIT 10;
+;
 
 select count(distinct id)
 FROM users;

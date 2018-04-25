@@ -111,15 +111,65 @@ WHERE
 
 CREATE VIEW wordpress.subscription_data_old AS
   (
-      SELECT s.*, p.name subscription_name, p.amount, p.recurring, p.interv, p.interval_count
-      FROM wordpress.subscriptions_old s
-        JOIN wordpress.plans_old p
-          ON s.plan_id = p.id
+    SELECT
+      s.id,
+      s.user_id,
+      s.plan_id,
+      s.course_id,
+      s.name,
+      s.stripe_id,
+      s.stripe_plan,
+      s.quantity,
+      s.trial_ends_at,
+      s.ends_at,
+      s.created_at,
+      s.updated_at,
+      s.deleted_at,
+      s.is_refunded,
+      p.name            subscription_name,
+      p.amount,
+      lower(u.email) AS email
+    FROM wordpress.subscriptions_old s
+      LEFT JOIN wordpress.plans_old p
+        ON s.plan_id = p.id
+      LEFT JOIN wordpress.users_old u
+        ON s.user_id = u.id
   );
 
 
-SELECT *
-FROM subscription_data_old;
+select *
+FROM payments_stripe_v2
+;
+
+SELECT * FROM subscription_data_old;
+
+select
+  email,
+  amount,
+  count(email)
+FROM subscription_data_old
+GROUP BY email, amount
+;
+
+SELECT distinct
+  customer_email,
+  amount,
+  status
+FROM payments_stripe_v2
+WHERE status = 'refunded'
+;
+
+
+SELECT
+  s.*,
+  (CASE WHEN p.status = 'refunded' THEN 1 ELSE 0 END) is_refunded
+FROM subscription_data_old s
+WHERE email IN
+;
+
+
+#################################################################################
+#################################################################################
 
 /*
     LIFETIME METRICS
@@ -163,48 +213,7 @@ sum( CASE WHEN LOWER(stripe_plan) NOT LIKE '%test%' AND is_refunded = 1 THEN amo
 FROM wordpress.subscription_data_old
 GROUP BY 1
 )
-#
-# UNION
-#
-#     ## NEW DATA
-# (
-# select
-# /*date(timestamp) as "date",*/
-# 'Total NEW' as name,
-# count(distinct user_id) as users,
-# count(distinct case when status='success' then user_id else 0 end) as active_users,
-# count(distinct case when status='cancelled' then user_id else 0 end) as refunds,
-# count(distinct id) as transactions,
-# sum(case when status='success' then total else 0 end) as gross_sales,
-# sum(case when status='cancelled' then total else 0 end) as refunded_amount
-# # (sum(case when status='success' then total else 0 end)-sum(case when status='cancelled' then total else 0 end)) as net_sales,
-#
-# FROM wordpress.wp_pmpro_membership_orders
-# /*##group by 1;*/
-# )
-# union
-# (
-# select
-# /*date(timestamp) as "date",*/
-# l.name,
-# count(distinct user_id) as users,
-# count(distinct case when status='success' then user_id else 0 end) as active_users,
-# count(distinct case when status='cancelled' then user_id else 0 end) as refunds,
-# count(distinct o.id) as transactions,
-# sum(case when status='success' then total else 0 end) as gross_sales,
-# sum(case when status='cancelled' then total else 0 end) as refunded_amount
-# # (sum(case when status='success' then total else 0 end)-sum(case when status='cancelled' then total else 0 end)) as net_sales,
-#
-# FROM wordpress.wp_pmpro_membership_orders o
-# join wordpress.wp_pmpro_membership_levels l
-# on o.membership_id = l.id
-# group by 1
-# );
-#
-
-
-
-
+;
 
 ###########################################################################################
 ###########################################################################################
@@ -229,21 +238,22 @@ CREATE VIEW wordpress.subscription_data_merged AS
       (
         (
           SELECT
-            date(created_at) AS date,
+            date(s.created_at) AS date,
             CASE
-            WHEN subscription_name = 'Roadmap'
+            WHEN s.subscription_name = 'Roadmap'
               THEN 'Road Map'
-            ELSE subscription_name
+            ELSE s.subscription_name
             END              AS subscription_name,
-            id               AS order_id,
-            user_id          AS user_id,
-            amount           AS total,
+            s.id               AS order_id,
+            s.user_id          AS user_id,
+            s.email            AS email,
+            s.amount           AS total,
             CASE
-            WHEN lower(stripe_plan) NOT LIKE '%test%' AND (deleted_at = 0 OR deleted_at IS NULL) AND is_refunded = 0
+            WHEN lower(s.stripe_plan) NOT LIKE '%test%' AND (s.deleted_at = 0 OR s.deleted_at IS NULL) AND s.is_refunded = 0
               THEN 'success'
             ELSE 'cancelled'
             END              AS status
-          FROM subscription_data_old
+          FROM subscription_data_old s
         )
         UNION
         (
@@ -252,19 +262,50 @@ CREATE VIEW wordpress.subscription_data_merged AS
             l.name            AS subscription_name,
             o.id              AS order_id,
             o.user_id         AS user_id,
+            u.user_email      AS email,
             o.total           AS total,
             o.status          AS status
           FROM wp_pmpro_membership_orders o
             JOIN wp_pmpro_membership_levels l
               ON o.membership_id = l.id
+            JOIN wp_users u
+              ON o.user_id = u.id
         )
       ) data
   )
 ;
 
+commit;
 
-SELECT sum(total)
+SELECT count(*)
 FROM subscription_data_merged;
+
+
+SELECT *
+FROM wordpress.wp_pmpro_memberships_users;
+
+SELECT count(payment_transaction_id)
+FROM wp_pmpro_membership_orders;
+
+SELECT *
+FROM subscription_data_old;
+
+##################################################################################################
+##################################################################################################
+
+
+/*
+  Compare merged data with stripe payments csv on stripe_id
+ */
+
+
+SELECT count(*)
+from subscription_data_merged as s
+where s.stripe_id IN (
+  SELECT DISTINCT id
+  FROM payments_stripe_v2
+)
+;
 
 
 
