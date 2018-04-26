@@ -27,18 +27,17 @@ FROM
   FROM
     (
       SELECT
-        date_trunc('day', created_at) as month,
+        date_trunc('month', created_at) as month,
         customer_id,
         order_number
-      FROM fod_team10
-      WHERE extract(month from created_at) = 4 and extract(year from created_at) = 2017
+      FROM fod_jakepaul
     ) as sub_A1
     JOIN
     (
       SELECT
         order_number,
         sum(price) as total_sales
-      FROM fld_team10
+      FROM fld_jakepaul
       GROUP BY order_number
     ) as sub_A2
     ON sub_A1.order_number = sub_A2.order_number
@@ -54,18 +53,17 @@ JOIN
   FROM
     (
       SELECT
-        date_trunc('day', created_at) as month,
+        date_trunc('month', created_at) as month,
         customer_id,
         order_number
-      FROM fod_team10
-      WHERE extract(month from created_at) = 4 AND extract(year from created_at) = 2017
+      FROM fod_jakepaul
     ) as sub_B1
     JOIN
     (
       SELECT
         order_number,
         sum(price) as total_sales
-      FROM fld_team10
+      FROM fld_jakepaul
       GROUP BY order_number
     ) as sub_B2
       ON sub_B1.order_number = sub_B2.order_number -- link b1 to b2
@@ -75,5 +73,7 @@ JOIN
   GROUP BY sub_B1.month
 ) as B
 on A.month = B.month
+WHERE
+  extract(month from A.month) = 4
 ORDER BY A.month
 ;

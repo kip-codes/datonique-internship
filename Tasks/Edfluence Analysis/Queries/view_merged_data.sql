@@ -89,7 +89,7 @@ CREATE VIEW wordpress.subscription_data_merged AS
               ON o.membership_id = l.id
             JOIN wp_users u
               ON o.user_id = u.id
-          WHERE DATE(o.timestamp) < CURDATE() - 1
+          WHERE DATE(o.timestamp) < CURDATE()
         )
       ) data
   )
@@ -156,3 +156,31 @@ WHERE subscription_name is not null
 GROUP BY 1,2
 ORDER BY date desc
 ;
+
+
+
+
+##############################################################################
+/*
+  Update merged_v2 with yesterday's completed data
+ */
+##############################################################################
+INSERT INTO wordpress.subscription_data_merged_v2
+  (
+    SELECT
+      DATE(o.timestamp) AS date,
+      l.name            AS subscription_name,
+      o.user_id         AS user_id,
+      u.user_email      AS email,
+      o.total           AS total,
+      o.status          AS status
+    FROM wp_pmpro_membership_orders o
+      JOIN wp_pmpro_membership_levels l
+        ON o.membership_id = l.id
+      JOIN wp_users u
+        ON o.user_id = u.id
+    WHERE DATE(o.timestamp) = CURDATE() - 1
+  )
+;
+
+SELECT curdate();
