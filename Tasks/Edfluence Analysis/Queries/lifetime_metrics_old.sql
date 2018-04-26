@@ -137,11 +137,18 @@ CREATE VIEW wordpress.subscription_data_old AS
   );
 
 
-select *
+select COUNT(*)
 FROM payments_stripe_v2
+where status = 'refunded'
 ;
 
-SELECT * FROM subscription_data_old;
+
+SELECT *
+FROM subscription_data_merged
+where email IN (
+  SELECT DISTINCT customer_email
+  FROM payments_stripe_v2
+);
 
 select
   email,
@@ -159,13 +166,6 @@ FROM payments_stripe_v2
 WHERE status = 'refunded'
 ;
 
-
-SELECT
-  s.*,
-  (CASE WHEN p.status = 'refunded' THEN 1 ELSE 0 END) is_refunded
-FROM subscription_data_old s
-WHERE email IN
-;
 
 
 #################################################################################
@@ -277,7 +277,7 @@ CREATE VIEW wordpress.subscription_data_merged AS
 
 commit;
 
-SELECT count(*)
+SELECT email
 FROM subscription_data_merged;
 
 
@@ -288,7 +288,7 @@ SELECT count(payment_transaction_id)
 FROM wp_pmpro_membership_orders;
 
 SELECT *
-FROM subscription_data_old;
+FROM subscription_data_old_v2;
 
 ##################################################################################################
 ##################################################################################################
@@ -299,13 +299,6 @@ FROM subscription_data_old;
  */
 
 
-SELECT count(*)
-from subscription_data_merged as s
-where s.stripe_id IN (
-  SELECT DISTINCT id
-  FROM payments_stripe_v2
-)
-;
 
 
 
@@ -320,11 +313,12 @@ select
   count(distinct user_id) as users,
   count(distinct case when status='success' then user_id else 0 end) as active_users,
   count(distinct case when status='cancelled' then user_id else 0 end) as refunds,
-  count(distinct order_id) as transactions,
+  sum(case when status='success' then 1 else 0 end) as transactions,
   sum(case when status='success' then total else 0 end) as gross_sales,
   sum(case when status='cancelled' then total else 0 end) as refunded_amount
-FROM wordpress.subscription_data_merged
-group by 1
+FROM wordpress.subscription_data_merged_v2
+WHERE subscription_name is not null
+# group by 1
 )
 union
 (
@@ -334,9 +328,64 @@ select
   count(distinct user_id) as users,
   count(distinct case when status='success' then user_id else 0 end) as active_users,
   count(distinct case when status='cancelled' then user_id else 0 end) as refunds,
-  count(distinct order_id) as transactions,
+  sum(case when status='success' then 1 else 0 end) as transactions,
   sum(case when status='success' then total else 0 end) as gross_sales,
   sum(case when status='cancelled' then total else 0 end) as refunded_amount
-FROM wordpress.subscription_data_merged
+FROM wordpress.subscription_data_merged_v2
+WHERE subscription_name IS NOT NULL
 group by 1
 );
+
+
+
+
+########################################################
+########################################################
+
+
+
+SELECT *
+FROM payments_stripe_v2;
+
+SELECT *
+from subscriptions_old;
+
+SELECT *
+FROM subscription_data_old;
+
+
+SELECT *
+FROM subscription_data_old_v2;
+
+
+SELECT *
+FROM subscription_data_merged;
+
+SELECT COUNT(*)
+from subscription_data_merged
+where status = 'cancelled';
+
+select *
+from subscription_data_merged_v2;
+
+SELECT COUNT(*)
+from subscription_data_merged_v2
+where status = 'cancelled';
+
+#########################################################
+#########################################################
+
+select distinct subscription_name
+FROM subscription_data_merged_v2;
+
+
+SELECT COUNT(*)
+FROM subscription_data_merged_v2
+WHERE subscription_name is not null and status = 'success'
+;
+
+SELECT date, subscription_name, COUNT(DISTINCT user_id)
+FROM subscription_data_merged_v2
+WHERE subscription_name is not null
+GROUP BY 1,2
+;
