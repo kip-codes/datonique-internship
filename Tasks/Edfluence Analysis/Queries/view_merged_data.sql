@@ -165,6 +165,7 @@ ORDER BY date desc
   Update merged_v2 with yesterday's completed data
  */
 ##############################################################################
+
 INSERT INTO wordpress.subscription_data_merged_v2
   (
     SELECT

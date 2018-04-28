@@ -379,3 +379,165 @@ ORDER BY "Total Sales" DESC
 LIMIT 100
 ;
 
+
+
+-- take from Team 10 Orders table to catch all
+-- Chance & Anthony Lifetime Top 100, Revisit
+SELECT DISTINCT
+  B.id,
+  B.name,
+  B.email,
+  B.country,
+  B.city,
+  count(distinct A.order_number) as "Number of Orders",
+  sum(C.sales) as "Total Sales"
+FROM
+  (
+    (
+      SELECT
+        order_number,
+        customer_id
+      FROM fod_team10
+    ) AS A
+    JOIN
+    (
+      SELECT
+        id,
+        initcap(first_name) + ' ' + initcap(last_name) AS name,
+        email,
+        initcap(country) as country,
+        initcap(city) as city
+      FROM fanjoy_customers_data
+    ) AS B
+      ON A.customer_id = B.id
+    JOIN
+    (
+      SELECT
+        order_number,
+        sum(price) AS sales
+      FROM fld_team10_nojake
+      WHERE
+        title ilike '%chad%tepper%'
+        or name ilike '%chad&tepper%'
+      GROUP BY order_number
+    ) AS C
+      ON A.order_number = C.order_number
+  )
+WHERE
+    customer_id IS NOT NULL
+    AND customer_id > 0
+    AND email IS NOT NULL
+    AND country IS NOT NULL
+    AND city IS NOT NULL
+GROUP BY id, name, email, country, city
+ORDER BY "Total Sales" DESC
+LIMIT 100
+;
+
+
+
+-- take from Team 10 Orders table to catch all
+-- Chance & Anthony Lifetime Top 100, Revisit
+SELECT DISTINCT
+  B.id,
+  B.name,
+  B.email,
+  B.country,
+  B.city,
+  count(distinct A.order_number) as "Number of Orders",
+  sum(C.sales) as "Total Sales"
+FROM
+  (
+    (
+      SELECT
+        order_number,
+        customer_id
+      FROM fod_team10
+    ) AS A
+    JOIN
+    (
+      SELECT
+        id,
+        initcap(first_name) + ' ' + initcap(last_name) AS name,
+        email,
+        initcap(country) as country,
+        initcap(city) as city
+      FROM fanjoy_customers_data
+    ) AS B
+      ON A.customer_id = B.id
+    JOIN
+    (
+      SELECT
+        order_number,
+        sum(price) AS sales
+      FROM fld_team10_nojake
+      WHERE
+        title ilike '%kade%speiser%'
+        or name ilike '%kade%speiser%'
+      GROUP BY order_number
+    ) AS C
+      ON A.order_number = C.order_number
+  )
+WHERE
+    customer_id IS NOT NULL
+    AND customer_id > 0
+    AND email IS NOT NULL
+    AND country IS NOT NULL
+    AND city IS NOT NULL
+GROUP BY id, name, email, country, city
+ORDER BY "Total Sales" DESC
+LIMIT 100
+;
+
+
+
+
+-- Team 10 Lifetime Top 100, Revisit
+
+SELECT DISTINCT
+  B.id,
+  B.name,
+  B.email,
+  B.country,
+  B.city,
+  count(distinct A.order_number) as "Number of Orders",
+  sum(C.sales) as "Total Sales"
+FROM
+  (
+    (
+      SELECT
+        order_number,
+        customer_id
+      FROM fod_team10
+    ) AS A
+    JOIN
+    (
+      SELECT
+        id,
+        initcap(first_name) + ' ' + initcap(last_name) AS name,
+        trim(lower(email)) as email,
+        initcap(country) as country,
+        initcap(city) as city
+      FROM fanjoy_customers_data
+    ) AS B
+      ON A.customer_id = B.id
+    JOIN
+    (
+      SELECT
+        order_number,
+        sum(price) AS sales
+      FROM fld_team10
+      GROUP BY order_number
+    ) AS C
+      ON A.order_number = C.order_number
+  )
+WHERE
+    customer_id IS NOT NULL
+    AND customer_id > 0
+    AND email IS NOT NULL
+    AND country IS NOT NULL
+    AND city IS NOT NULL
+GROUP BY id, name, email, country, city
+ORDER BY "Total Sales" DESC
+LIMIT 100
+;
