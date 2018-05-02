@@ -27,18 +27,21 @@ FROM
   ) AS C
   on a.customer_id = c.id
 WHERE lower(email) IN (
-  0
+0
 )
 ;
 
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-SELECT DISTINCT lower(email)
-FROM fanjoy_customers_data
+SELECT COUNT(DISTINCT lower(email))
+FROM fanjoy_orders_data
 WHERE
-  total_spent > 0
-  and lower(email) in (
-    0
-  )
+  total_price > 0
+;
+
+
+select COUNT(DISTINCT phone)
+FROM fanjoy_customers_data
+WHERE total_spent > 0
 ;

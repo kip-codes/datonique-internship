@@ -166,6 +166,7 @@ ORDER BY date desc
  */
 ##############################################################################
 
+
 INSERT INTO wordpress.subscription_data_merged_v2
   (
     SELECT
@@ -185,3 +186,74 @@ INSERT INTO wordpress.subscription_data_merged_v2
 ;
 
 SELECT curdate();
+
+
+########################################################################
+########################################################################
+
+CREATE TABLE IF NOT EXISTS wordpress.merge_crontab_test AS
+  (
+    SELECT
+      DATE(o.timestamp) AS date,
+      l.name            AS subscription_name,
+      o.id              AS order_id,
+      o.user_id         AS user_id,
+      u.user_email      AS email,
+      o.total           AS total,
+      o.status          AS status
+    FROM wp_pmpro_membership_orders o
+      JOIN wp_pmpro_membership_levels l
+        ON o.membership_id = l.id
+      JOIN wp_users u
+        ON o.user_id = u.id
+    WHERE DATE(o.timestamp) = CURDATE() - interval 1 day
+  )
+;
+
+INSERT INTO wordpress.merge_crontab_test
+(
+  SELECT
+    DATE(o.timestamp) AS date,
+    l.name            AS subscription_name,
+    o.id              AS order_id,
+    o.user_id         AS user_id,
+    u.user_email      AS email,
+    o.total           AS total,
+    o.status          AS status
+  FROM wp_pmpro_membership_orders o
+    JOIN wp_pmpro_membership_levels l
+      ON o.membership_id = l.id
+    JOIN wp_users u
+      ON o.user_id = u.id
+  WHERE DATE(o.timestamp) = CURDATE() - interval 2 day
+);
+
+SELECT date(timestamp) from wp_pmpro_membership_orders;
+SELECT curdate() - interval 1 day;
+SELECT curdate() - interval 2 day;
+SELECT * from wordpress.merge_crontab_test;
+SELECT * from wordpress.subscription_data_merged_v2
+order by date desc
+limit 10;
+select date(date) from subscription_data_merged_v2;
+
+
+
+
+INSERT INTO wordpress.subscription_data_merged_v2
+  (
+    SELECT
+      DATE(o.timestamp) AS date,
+      l.name            AS subscription_name,
+      o.user_id         AS user_id,
+      u.user_email      AS email,
+      o.total           AS total,
+      o.status          AS status
+    FROM wp_pmpro_membership_orders o
+      JOIN wp_pmpro_membership_levels l
+        ON o.membership_id = l.id
+      JOIN wp_users u
+        ON o.user_id = u.id
+    WHERE DATE(o.timestamp) = CURDATE() - interval 2 day
+  )
+;

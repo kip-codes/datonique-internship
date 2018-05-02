@@ -108,6 +108,7 @@ FROM
         customer_id,
         order_number
       from fod_jakepaul
+      WHERE extract(month from created_at) = 4 AND extract(year from created_at) = 2017
     ) as A
   join
     (
