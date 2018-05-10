@@ -40,7 +40,7 @@ def main():
             print("Attempting to connect to URL...")
             json_obj = requests.get(intermediate_url, auth=(creds['api_key'], creds['pw']))
         except requests.HTTPError as err:
-            print(err)
+            print(err,"Connection failure.")
             quit()
         print("Connected.")
 
