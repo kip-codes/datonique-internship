@@ -5,23 +5,29 @@
 #
 # For inquiries about the file please contact the author.
 
-import json, datetime, os
+import json, datetime, os, time
 from pathlib import Path
-
-try:
-    import cPickle as pickle
-except ImportError:  # python 3.x
-    import pickle
 
 
 today = datetime.datetime.today()
 
 def cleanupCustomers():
     """Cleanup customers.json"""
+    d = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
+    fn = d + 'jp_customers.json'
+    print(fn)
+    try:
+        if (os.path.isfile(fn)):
+            print("File found! Proceeding to cleanup...")
+            time.sleep(1)
+    except IOError:
+        print("\nNo recent export for Customers found."
+              "\nReturning...")
+        return
 
-    with open('5-10-2018jp_customers.json', 'r') as f:
+    with open(fn, 'r') as f:
         data = json.load(f)
-        print(json.dumps(data, indent=4, sort_keys=True))
+        # print(json.dumps(data, indent=4, sort_keys=True))
 
         # Define a new list to contain collapsed dictionaries from source
         newDictStorage = []
@@ -50,28 +56,42 @@ def cleanupCustomers():
             newDictStorage.append(newDict)
 
         print(newDictStorage)
-        print(json.dumps(newDictStorage, indent=4, sort_keys=True))
+        # print(json.dumps(newDictStorage, indent=4, sort_keys=True))
 
         # Cleanup data so that it can be read by a COPY command using auto
         c = input("Write data? (y/n): ")
         if c == 'y':
+            ofiledir = '/Users/kevinip/Documents/POST GRAD/PyCharm Projects/kevinip-sandbox/Tasks/Fanjoy Analysis/Queries/jp-test/customers-cleaned/'
             ofilename = (str(today.month) + '-' + str(today.day) + '-' + str(today.year) + 'jp_customers_cleaned.json')
+            fn = ofiledir + ofilename
+            os.makedirs(ofiledir, exist_ok=True)
             objCount = 0
-            with open(ofilename, 'w') as ofile:
+            with open(fn, 'w') as f:
                 for obj in newDictStorage:
-                    json.dump(obj, ofile)
-                    ofile.write('\n')
+                    json.dump(obj, f)
+                    f.write('\n')
                     objCount += 1
             print("Write successful. {} objects written.".format(objCount))
-        else: print("exiting...")
+        else: print("Returning...")
 
 
 def cleanupOrders():
     """Cleanup orders.json"""
+    d = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
+    fn = d + 'jp_orders.json'
+    print(fn)
+    try:
+        if (os.path.isfile(fn)):
+            print("File found! Proceeding to cleanup...")
+            time.sleep(1)
+    except IOError:
+        print("\nNo recent export for Orders found."
+              "\nReturning...")
+        return
 
-    with open('5-10-2018jp_orders.json', 'r') as f:
+    with open(fn, 'r') as f:
         data = json.load(f)
-        print(json.dumps(data, indent=4, sort_keys=True))
+        # print(json.dumps(data, indent=4, sort_keys=True))
 
         # Define a new list to contain collapsed dictionaries from source
         newDictStorage = []
@@ -101,29 +121,45 @@ def cleanupOrders():
 
 
         print(newDictStorage)
-        print(json.dumps(newDictStorage, indent=4, sort_keys=True))
+        # print(json.dumps(newDictStorage, indent=4, sort_keys=True))
 
 
         # Cleanup data so that it can be read by a COPY command using auto
         c = input("Write data? (y/n): ")
         if c == 'y':
+            ofiledir = '/Users/kevinip/Documents/POST GRAD/PyCharm Projects/kevinip-sandbox/Tasks/Fanjoy Analysis/Queries/jp-test/orders-cleaned/'
             ofilename = (str(today.month) + '-' + str(today.day) + '-' + str(today.year) + 'jp_orders_cleaned.json')
             objCount = 0
-            with open(ofilename, 'w') as ofile:
+            fn = ofiledir + ofilename
+            os.makedirs(ofiledir, exist_ok=True)
+
+            with open(fn, 'w') as f:
                 for obj in newDictStorage:
-                    json.dump(obj, ofile)
-                    ofile.write('\n')
+                    json.dump(obj, f)
+                    f.write('\n')
                     objCount += 1
             print("Write successful. {} objects written.".format(objCount))
-        else: print("exiting...")
+        else: print("Returning...")
 
 
 def cleanupLineItems():
     """Cleanup orders.json and extract only line item data"""
+    d = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
+    fn = d + 'jp_orders.json'
+    print(fn)
+    try:
+        if (os.path.isfile(fn)):
+            print("File found! Proceeding to cleanup...")
+            time.sleep(1)
+    except IOError:
+        print("\nNo recent export for Orders found."
+              "\nReturning...")
+        return
 
-    with open('5-10-2018jp_orders.json', 'r') as f:
+
+    with open(fn, 'r') as f:
         data = json.load(f)
-        print(json.dumps(data, indent=4, sort_keys=True))
+        # print(json.dumps(data, indent=4, sort_keys=True))
 
         # Define a new list to contain collapsed dictionaries from source
         newDictStorage = []
@@ -134,6 +170,7 @@ def cleanupLineItems():
                 if type(n[key]) is list and key == 'line_items':
                     for obj in n[key]: # obj is a dictionary
                         newDict = {}
+                        newDict['order_number'] = n['order_number']
                         for k in obj: # k is the key inside each line item
                             if type(obj[k]) is not dict and type(obj[k]) is not list:
                                 newDict[k] = obj[k]
@@ -142,27 +179,42 @@ def cleanupLineItems():
                         newDictStorage.append(newDict)
 
         print(newDictStorage)
-        print(json.dumps(newDictStorage, indent=4, sort_keys=True))
+        # print(json.dumps(newDictStorage, indent=4, sort_keys=True))
 
 
         # Cleanup data so that it can be read by a COPY command using auto
         c = input("Write data? (y/n): ")
         if c == 'y':
+            ofiledir = '/Users/kevinip/Documents/POST GRAD/PyCharm Projects/kevinip-sandbox/Tasks/Fanjoy Analysis/Queries/jp-test/lineitems-cleaned/'
             ofilename = (str(today.month) + '-' + str(today.day) + '-' + str(today.year) + 'jp_lineitems_cleaned.json')
             objCount = 0
-            with open(ofilename, 'w') as ofile:
+            os.makedirs(ofiledir, exist_ok=True)
+            fn = ofiledir + ofilename
+            with open(fn, 'w') as f:
                 for obj in newDictStorage:
-                    json.dump(obj, ofile)
-                    ofile.write('\n')
+                    json.dump(obj, f)
+                    f.write('\n')
                     objCount += 1
             print("Write successful. {} objects written.".format(objCount))
-        else: print("exiting...")
+        else: print("Returning...")
 
 
 def cleanupProducts():
     """Cleanup products.json"""
+    d = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
+    fn = d + 'jp_products.json'
+    print(fn)
+    try:
+        if (os.path.isfile(fn)):
+            print("File found! Proceeding to cleanup...")
+            time.sleep(1)
+    except IOError:
+        print("\nNo recent export for Products found."
+              "\nReturning...")
+        return
 
-    with open('5-10-2018jp_products.json', 'r') as f:
+
+    with open(fn, 'r') as f:
         data = json.load(f)
         # print(json.dumps(data, indent=4, sort_keys=True))
 
@@ -195,29 +247,53 @@ def cleanupProducts():
 
 
         print(newDictStorage)
-        print(json.dumps(newDictStorage, indent=4, sort_keys=True))
+        # print(json.dumps(newDictStorage, indent=4, sort_keys=True))
 
 
         # Cleanup data so that it can be read by a COPY command using auto
         c = input("Write data? (y/n): ")
         if c == 'y':
+            ofiledir = '/Users/kevinip/Documents/POST GRAD/PyCharm Projects/kevinip-sandbox/Tasks/Fanjoy Analysis/Queries/jp-test/products-cleaned/'
             ofilename = (str(today.month) + '-' + str(today.day) + '-' + str(today.year) + 'jp_products_cleaned.json')
             objCount = 0
-            with open(ofilename, 'w') as ofile:
+            fn = ofiledir + ofilename
+            os.makedirs(ofiledir, exist_ok=True)
+            with open(fn, 'w') as f:
                 for obj in newDictStorage:
-                    json.dump(obj, ofile)
-                    ofile.write('\n')
+                    json.dump(obj, f)
+                    f.write('\n')
                     objCount += 1
             print("Write successful. {} objects written.".format(objCount))
-        else: print("exiting...")
+        else: print("Returning...")
+
+
+def main():
+    while True:
+        c = input("\nChoose an option (q to quit):"
+                  "\n1. EXPORT ALL"
+                  "\n2. Customers"
+                  "\n3. Orders"
+                  "\n4. Products"
+                  "\n5. Line items\n")
+        if c == 'q':
+            print("\nExiting...")
+            time.sleep(1)
+            quit()
+        elif c == '1':
+            cleanupCustomers()
+            cleanupOrders()
+            cleanupProducts()
+            cleanupLineItems()
+            print("\nExiting...")
+            time.sleep(1)
+            quit()
+        elif c == '2': cleanupCustomers()
+        elif c == '3': cleanupOrders()
+        elif c == '4': cleanupProducts()
+        elif c == '5': cleanupLineItems()
+        else: print("Invalid input.")
 
 
 if __name__ == '__main__':
     print(os.getcwd())
-
-    c = input("\nChoose 1. Customers, 2. Orders, 3. Products. 4. Line items\n")
-    if c == '1': cleanupCustomers()
-    elif c == '2': cleanupOrders()
-    elif c == '3': cleanupProducts()
-    elif c == '4': cleanupLineItems()
-    else: print("Wrong input. Exiting...")
+    main()

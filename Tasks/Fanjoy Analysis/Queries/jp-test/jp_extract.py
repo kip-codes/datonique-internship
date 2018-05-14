@@ -7,21 +7,22 @@
 
 
 import json, requests, datetime, time
-import jp_extract_functions as jp
+import jp_extract_functions as jp_extract
+import jp_extract_cleanup as jp_clean
 
 today = datetime.datetime.now()
 
 
-def main():
+def extract():
     """Main function"""
     # List of nodes to export
     nodes = ['customers', 'orders', 'products']
 
-    creds = jp.takeCredentials()
+    creds = jp_extract.takeCredentials()
 
     while True:
-        nodetype = jp.takeNode(nodes)
-        intermediate_url = jp.makeURL(creds, nodetype)
+        nodetype = jp_extract.takeNode(nodes)
+        intermediate_url = jp_extract.makeURL(creds, nodetype)
 
         try:
             print("Attempting to connect to URL...")
@@ -49,20 +50,25 @@ def main():
                 if cq2 in ('y', 'yes'):
                     continue  # restart input query for node
                 elif cq2 in ('n', 'no'):
-                    quit()
+                    return
                 else:
                     print("Invalid response.")
             else:  # all nodes have been exported
-                print("\nYou have exported all three nodes. Exiting...")
+                print("\nYou have exported all three nodes. Proceeding to cleanup...")
                 time.sleep(2)
-                quit()
+                return
         elif cq1 in ('n', 'no'):  # User chooses to exit program
             print("Exiting...")
             time.sleep(2)
-            quit()
+            return
         else:
             print("Invalid response.")
 
 
+def cleanup():
+    jp_clean.main()
+
+
 if __name__ == '__main__':
-    main()
+    extract()
+    cleanup()
