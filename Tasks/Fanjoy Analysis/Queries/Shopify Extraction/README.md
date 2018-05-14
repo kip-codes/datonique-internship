@@ -1,4 +1,4 @@
-# Project Title
+# Extracting Data from Shopify Storefront API
 
 This extraction process will pull the most important data from the Shopify API, particularly from the nodes of Customers, Orders, and Products.
 
