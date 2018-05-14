@@ -77,5 +77,45 @@ def takeNode(nodes):
             print("Invalid node type. Please enter the numerical value of the categories above.")
 
 
+def takeExportNode(nodes):
+    while True:
+        print("\nEnter which of the following nodes you would like to export:")
+        print("1. EXPORT ALL")
+        if 'customers' in nodes:
+            print("2. Customers")
+        else: # customers has been exported already
+            print(strike("2. Customers"))
+        if 'orders' in nodes:
+            print("3. Orders")
+        else: # orders has been exported already
+            print(strike("3. Orders"))
+        if 'products' in nodes:
+            print("4. Products")
+        else: # products has been exported already
+            print(strike("4. Products"))
+        if 'line items' in nodes:
+            print("5. Line Items")
+        else: # line items has been exported already
+            print(strike("5. Line Items"))
+
+        nodetype = input('\n')
+        # Convert nodetype to string
+        if nodetype in ('1', 'all', 'export all'):
+            return nodes
+        if nodetype in ('2', 'customers') and nodetype in nodes:
+            nodes.remove('customers')
+            return ['customers']
+        elif nodetype in ('3', 'orders') and nodetype in nodes:
+            nodes.remove('orders')
+            return ['orders']
+        elif nodetype in ('4', 'products') and nodetype in nodes:
+            nodes.remove('products')
+            return ['products']
+        elif nodetype in ('5', 'line items') and nodetype in nodes:
+            nodes.remove('line items')
+            return ['line items']
+        else:
+            print("Invalid node type. Please enter the numerical value of the categories above.")
+
 def makeURL(creds, nodetype):
     return 'https://' + creds['storeurl'] + '.myshopify.com/admin/' + nodetype + '.json'

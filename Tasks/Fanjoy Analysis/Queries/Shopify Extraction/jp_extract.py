@@ -6,20 +6,21 @@
 # For inquiries about the file please contact the author.
 
 
-import json, requests, datetime, time
+import json, requests, datetime, time, os
 import jp_extract_functions as jp_extract
 import jp_extract_cleanup as jp_clean
 import boto3  # upload JSON to S3 Bucket
 
 today = datetime.datetime.now()
+todayfn = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
 
 
 def extract():
     """Main function"""
     # List of nodes to export
     nodes = ['customers', 'orders', 'products']
-
     creds = jp_extract.takeCredentials()
+
 
     while True:
         nodetype = jp_extract.takeNode(nodes)
@@ -67,9 +68,65 @@ def extract():
 
 
 def cleanup():
-    jp_clean.main()
+    return jp_clean.main()
+
+
+def uploadToS3():
+    print(os.getcwd())
+    import boto3
+    from botocore.client import Config
+
+    ACCESS_KEY_ID = input("Enter your AWS Access Key:\t")
+    ACCESS_SECRET_KEY = input("Enter your AWS Secret Access Key:\t")
+
+    # S3 Connect
+    s3 = boto3.resource(
+        's3',
+        aws_access_key_id=ACCESS_KEY_ID,
+        aws_secret_access_key=ACCESS_SECRET_KEY,
+        config=Config(signature_version='s3v4')
+    )
+
+    nodes = ['customers','orders','products','lineitems']
+
+    while nodes:
+        for node in nodes:
+            # This is the name of the bucket on S3.
+            BUCKET_NAME = 'kevin-ip'
+
+            # This is the subdirectory path inside the S3 Bucket.
+            KEY = 'jakepaulofficial/' + node + '/' + todayfn + 'jp_' + node + '_cleaned.json'
+
+            # This is the local path to the file you want to upload.
+            FILE_NAME = node + '-cleaned/' + todayfn + 'jp_' + node + '_cleaned.json'
+            try:
+                data = open(FILE_NAME, 'rb')  # check if file exists
+            except:
+                print("WARNING: A valid file for " + node.upper() + " was not found. Proceeding to other nodes...")
+                nodes.remove(node)
+                time.sleep(1)
+                continue
+
+            data = open(FILE_NAME, 'rb')
+            # JSON Uploaded
+            s3.Bucket(BUCKET_NAME).put_object(Key=KEY, Body=data, ACL='authenticated-read')
+            nodes.remove(node)
+            print("\n{} has been successfully uploaded.".format(node))
+
+    print("\nDone")
 
 
 if __name__ == '__main__':
-    extract()
-    cleanup()
+    while True:
+        c = input("Would you like to:"
+                  "\n1. Extract JSON from API"
+                  "\n2. Clean up JSON for Redshift"
+                  "\n3. Upload reformatted JSON to S3"
+                  "\n('q' to exit)\n")
+        if c == 'q':
+            print("Exiting...")
+            time.sleep(1)
+            quit()
+        if c == '1': extract()
+        if c == '2': cleanup()
+        if c == '3': uploadToS3()
