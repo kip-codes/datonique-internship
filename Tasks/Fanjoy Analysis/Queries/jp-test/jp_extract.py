@@ -9,6 +9,7 @@
 import json, requests, datetime, time
 import jp_extract_functions as jp_extract
 import jp_extract_cleanup as jp_clean
+import boto3  # upload JSON to S3 Bucket
 
 today = datetime.datetime.now()
 
