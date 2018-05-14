@@ -30,4 +30,4 @@ It will also create a subdirectory for cleaned .json files, if one does not alre
 
 ## Authors
 
-* **Kevin Ipn** - *Initial work* - [kip-codes](https://github.com/kip-codes)
+* **Kevin Ip** - *Initial work* - [kip-codes](https://github.com/kip-codes)

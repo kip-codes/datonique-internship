@@ -61,7 +61,7 @@ def cleanupCustomers():
         # Cleanup data so that it can be read by a COPY command using auto
         c = input("Write data? (y/n): ")
         if c == 'y':
-            ofiledir = '/Users/kevinip/Documents/POST GRAD/PyCharm Projects/kevinip-sandbox/Tasks/Fanjoy Analysis/Queries/jp-test/customers-cleaned/'
+            ofiledir = '/Users/kevinip/Documents/POST GRAD/PyCharm Projects/kevinip-sandbox/Tasks/Fanjoy Analysis/Queries/Shopify Extraction/customers-cleaned/'
             ofilename = (str(today.month) + '-' + str(today.day) + '-' + str(today.year) + 'jp_customers_cleaned.json')
             fn = ofiledir + ofilename
             os.makedirs(ofiledir, exist_ok=True)
@@ -127,7 +127,7 @@ def cleanupOrders():
         # Cleanup data so that it can be read by a COPY command using auto
         c = input("Write data? (y/n): ")
         if c == 'y':
-            ofiledir = '/Users/kevinip/Documents/POST GRAD/PyCharm Projects/kevinip-sandbox/Tasks/Fanjoy Analysis/Queries/jp-test/orders-cleaned/'
+            ofiledir = '/Users/kevinip/Documents/POST GRAD/PyCharm Projects/kevinip-sandbox/Tasks/Fanjoy Analysis/Queries/Shopify Extraction/orders-cleaned/'
             ofilename = (str(today.month) + '-' + str(today.day) + '-' + str(today.year) + 'jp_orders_cleaned.json')
             objCount = 0
             fn = ofiledir + ofilename
@@ -185,7 +185,7 @@ def cleanupLineItems():
         # Cleanup data so that it can be read by a COPY command using auto
         c = input("Write data? (y/n): ")
         if c == 'y':
-            ofiledir = '/Users/kevinip/Documents/POST GRAD/PyCharm Projects/kevinip-sandbox/Tasks/Fanjoy Analysis/Queries/jp-test/lineitems-cleaned/'
+            ofiledir = '/Users/kevinip/Documents/POST GRAD/PyCharm Projects/kevinip-sandbox/Tasks/Fanjoy Analysis/Queries/Shopify Extraction/lineitems-cleaned/'
             ofilename = (str(today.month) + '-' + str(today.day) + '-' + str(today.year) + 'jp_lineitems_cleaned.json')
             objCount = 0
             os.makedirs(ofiledir, exist_ok=True)
@@ -253,7 +253,7 @@ def cleanupProducts():
         # Cleanup data so that it can be read by a COPY command using auto
         c = input("Write data? (y/n): ")
         if c == 'y':
-            ofiledir = '/Users/kevinip/Documents/POST GRAD/PyCharm Projects/kevinip-sandbox/Tasks/Fanjoy Analysis/Queries/jp-test/products-cleaned/'
+            ofiledir = '/Users/kevinip/Documents/POST GRAD/PyCharm Projects/kevinip-sandbox/Tasks/Fanjoy Analysis/Queries/Shopify Extraction/products-cleaned/'
             ofilename = (str(today.month) + '-' + str(today.day) + '-' + str(today.year) + 'jp_products_cleaned.json')
             objCount = 0
             fn = ofiledir + ofilename
