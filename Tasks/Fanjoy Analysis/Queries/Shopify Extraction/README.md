@@ -26,8 +26,8 @@ If a connection cannot be established to the storefront API, the script will end
 ## Deployment
 
 *jp_extract.py* requires .json files in the same directory it is stored in.
-It will also create a subdirectory for cleaned .json files, if one does not already exist.\
-Alternatively, run *jp_extract_cleanup* if you already have .json from Shopify and you only need to fold it.
+It will also create a subdirectory for cleaned .json files, if one does not already exist.\\
+Alternatively, run *jp_extract_cleanup.py* if you already have .json from Shopify and you only need to fold it.
 
 ## Authors
 
