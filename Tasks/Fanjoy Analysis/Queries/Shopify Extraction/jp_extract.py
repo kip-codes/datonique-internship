@@ -6,7 +6,7 @@
 # For inquiries about the file please contact the author.
 
 
-import json, requests, datetime, time, os
+import json, requests, datetime, time, os, sys
 import jp_extract_functions as jp_extract
 import jp_extract_cleanup as jp_clean
 import boto3  # upload JSON to S3 Bucket
@@ -15,7 +15,14 @@ today = datetime.datetime.now()
 todayfn = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
 
 
-def extract():
+def strike(text):
+    result = ''
+    for c in text:
+        result = result + c + '\u0336'
+    return result
+
+
+def extract(admin=False):
     """Main function"""
     # List of nodes to export
     nodes = ['customers', 'orders', 'products']
@@ -34,12 +41,17 @@ def extract():
             quit()
         print("Connected.")
 
-        if input("Print results? (y/n): ") in ('y', 'yes'):
-            print('\n', json_obj.headers['content-type'], json_obj.encoding)
-            print(json.dumps(json_obj.json(), indent=4, sort_keys=True))
+        if admin:
+            if input("Print results? (y/n): ") in ('y', 'yes'):
+                print('\n', json_obj.headers['content-type'], json_obj.encoding)
+                print(json.dumps(json_obj.json(), indent=4, sort_keys=True))
+            else: pass
 
         # Write to file
-        cq1 = input("\nWrite to file? (y/n): ")
+        if not admin:
+            cq1 = 'y'
+        else:
+            cq1 = input("\nWrite to file? (y/n): ")
         if cq1 in ('y', 'yes'):
             print("Writing...")
             ofilename = (str(today.month) + '-' + str(today.day) + '-' + str(today.year) + 'jp_' + nodetype + '.json')
@@ -48,15 +60,19 @@ def extract():
             print("Write successful.")
             nodes.remove(nodetype)   # removes the node that has been successfully exported
             if nodes:  # There are still nodes that have not been exported
-                cq2 = input("\nWould you like to export another node? (y/n): ")
-                if cq2 in ('y', 'yes'):
-                    continue  # restart input query for node
-                elif cq2 in ('n', 'no'):
-                    return
-                else:
-                    print("Invalid response.")
+                if not admin:
+                    continue
+                else:  # if admin walkthrough
+                    cq2 = input("\nWould you like to export another node? (y/n): ")
+                    if cq2 in ('y', 'yes'):
+                        continue  # restart input query for node
+                    elif cq2 in ('n', 'no'):
+                        return
+                    else:
+                        print("Invalid response.")
             else:  # all nodes have been exported
                 print("\nYou have exported all three nodes. Proceeding to cleanup...")
+                choices.remove(1)
                 time.sleep(2)
                 return
         elif cq1 in ('n', 'no'):  # User chooses to exit program
@@ -67,8 +83,8 @@ def extract():
             print("Invalid response.")
 
 
-def cleanup():
-    return jp_clean.main()
+def cleanup(choices, admin=False):
+    return jp_clean.main(choices, admin)
 
 
 def uploadToS3():
@@ -113,7 +129,8 @@ def uploadToS3():
             nodes.remove(node)
             print("\n{} has been successfully uploaded.".format(node))
 
-    print("\nDone")
+    choices.remove(3)
+    print("\nAll nodes have been successfully uploaded to the bucket " + BUCKET_NAME + ". Returning to main menu...\n")
 
 
 def removeExtracts():
@@ -130,6 +147,7 @@ def removeExtracts():
         os.remove(fn)
         print(n.upper() + ' has been deleted from your directory.')
         fcount += 1
+    choices.remove(4)
     print('\n' + str(fcount) + ' files removed. Returning to main menu...\n')
     time.sleep(1)
 
@@ -137,18 +155,52 @@ def removeExtracts():
 
 
 if __name__ == '__main__':
-    while True:
-        c = input("Would you like to:"
-                  "\n1. Extract JSON from API"
-                  "\n2. Clean up JSON for Redshift"
-                  "\n3. Upload reformatted JSON to S3"
-                  "\n4. Delete raw JSON exports from local directory"
-                  "\n('q' to exit)\n")
-        if c == 'q':
-            print("Exiting...")
-            time.sleep(1)
-            quit()
-        if c == '1': extract()
-        if c == '2': cleanup()
-        if c == '3': uploadToS3()
-        if c == '4': removeExtracts()
+    choices = [1,2,3,4]
+
+    # Simple script, automatically complete all procedures
+    if len(sys.argv) == 1:
+        extract()
+        cleanup(choices)
+        uploadToS3()
+        removeExtracts()
+
+    # Admin ; allow user to choose which procedures to undergo
+    if len(sys.argv) == 2 and sys.argv[2] == 'admin':
+        while True:
+            print("\nWould you like to:")
+            if 1 in choices:
+                print("1. Extract JSON from API")
+            else:
+                print(strike("1. Extract JSON from API"))
+            if 2 in choices:
+                print("2. Clean up JSON for Redshift")
+            else:
+                print(strike("2. Clean up JSON for Redshift"))
+            if 3 in choices:
+                print("3. Upload reformatted JSON to S3")
+            else:
+                print(strike("3. Upload reformatted JSON to S3"))
+            if 4 in choices:
+                print("4. Delete raw JSON exports from local directory")
+            else:
+                print(strike("4. Delete raw JSON exports from local directory"))
+
+            c = input("\n('q' to exit)\n>>\t")
+            if c == 'q' or not choices:
+                print("Exiting...")
+                time.sleep(1)
+                quit()
+            if c == '1': extract(admin=True)
+            if c == '2': cleanup(choices, admin=True)
+            if c == '3': uploadToS3()
+            if c == '4': removeExtracts()
+
+    # # Simple script, with all credentials provided.
+    # if len(sys.argv) == 6 and sys.argv[2] != 'admin':
+    #     extract(sys.argv[2], sys.argv[3], sys.argv[4])
+    #     cleanup(choices)
+    #     uploadToS3()
+    #     removeExtracts()
+
+    else:
+        print("usage: <script.py> [store name] [store password] [store API] [AWS access] [AWS secret access]")

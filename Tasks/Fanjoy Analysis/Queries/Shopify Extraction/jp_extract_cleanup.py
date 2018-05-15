@@ -11,7 +11,7 @@ from pathlib import Path
 
 today = datetime.datetime.today()
 
-def cleanupCustomers():
+def cleanupCustomers(admin=False):
     """Cleanup customers.json"""
     d = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
     fn = d + 'jp_customers.json'
@@ -36,8 +36,7 @@ def cleanupCustomers():
         for n in data['customers']: # each element is a distinct customer
             newDict = {}
             for key in n: # list of left hand keys
-                if type(n[key]) is list: print('this is a list!')
-                elif type(n[key]) is not dict: # valid folding
+                if type(n[key]) is not dict and type(n[key]) is not list: # valid folding
                     # print(type(n[key]), key, n[key])
                     newDict[key] = n[key]
                     # print(newDict[key])
@@ -55,11 +54,14 @@ def cleanupCustomers():
                     newDict['zip'] = n[key]['zip']
             newDictStorage.append(newDict)
 
-        print(newDictStorage)
+        # print(newDictStorage)
         # print(json.dumps(newDictStorage, indent=4, sort_keys=True))
 
         # Cleanup data so that it can be read by a COPY command using auto
-        c = input("Write data? (y/n): ")
+        if not admin:
+            c = 'y'
+        else:
+            c = input("Write data? (y/n): ")
         if c == 'y':
             ofiledir = '/Users/kevinip/Documents/POST GRAD/PyCharm Projects/kevinip-sandbox/Tasks/Fanjoy Analysis/Queries/Shopify Extraction/customers-cleaned/'
             ofilename = (str(today.month) + '-' + str(today.day) + '-' + str(today.year) + 'jp_customers_cleaned.json')
@@ -75,7 +77,7 @@ def cleanupCustomers():
         else: print("Returning...")
 
 
-def cleanupOrders():
+def cleanupOrders(admin=False):
     """Cleanup orders.json"""
     d = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
     fn = d + 'jp_orders.json'
@@ -100,15 +102,13 @@ def cleanupOrders():
         for n in data['orders']:  # each element is a distinct customer
             newDict = {}
             for key in n:  # list of left hand keys
-                if type(n[key]) is list:
-                    print('this is a list!')
-                elif type(n[key]) is not dict:  # valid folding
+                if type(n[key]) is not dict and type(n[key]) is not list:  # valid folding
                     # print(type(n[key]), key, n[key])
                     newDict[key] = n[key]
                     # print(newDict[key])
             for key in n:
                 if type(n[key]) is dict and key == 'customer':  # overwrite with dict values, usually the default addres object.
-                    print('Dictionary found! Folding...')
+                    # print('Dictionary found! Folding...')
                     newDict['customer_id'] = n[key]['id']
                     newDict['customer_email'] = n[key]['email']
                     newDict['customer_created_at'] = n[key]['created_at']
@@ -120,12 +120,15 @@ def cleanupOrders():
             newDictStorage.append(newDict)
 
 
-        print(newDictStorage)
+        # print(newDictStorage)
         # print(json.dumps(newDictStorage, indent=4, sort_keys=True))
 
 
         # Cleanup data so that it can be read by a COPY command using auto
-        c = input("Write data? (y/n): ")
+        if not admin:
+            c = 'y'
+        else:
+            c = input("Write data? (y/n): ")
         if c == 'y':
             ofiledir = '/Users/kevinip/Documents/POST GRAD/PyCharm Projects/kevinip-sandbox/Tasks/Fanjoy Analysis/Queries/Shopify Extraction/orders-cleaned/'
             ofilename = (str(today.month) + '-' + str(today.day) + '-' + str(today.year) + 'jp_orders_cleaned.json')
@@ -142,7 +145,7 @@ def cleanupOrders():
         else: print("Returning...")
 
 
-def cleanupLineItems():
+def cleanupLineItems(admin=False):
     """Cleanup orders.json and extract only line item data"""
     d = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
     fn = d + 'jp_orders.json'
@@ -178,12 +181,15 @@ def cleanupLineItems():
                         # After every key in this specific line item has been processed, append to object
                         newDictStorage.append(newDict)
 
-        print(newDictStorage)
+        # print(newDictStorage)
         # print(json.dumps(newDictStorage, indent=4, sort_keys=True))
 
 
         # Cleanup data so that it can be read by a COPY command using auto
-        c = input("Write data? (y/n): ")
+        if not admin:
+            c = 'y'
+        else:
+            c = input("Write data? (y/n): ")
         if c == 'y':
             ofiledir = '/Users/kevinip/Documents/POST GRAD/PyCharm Projects/kevinip-sandbox/Tasks/Fanjoy Analysis/Queries/Shopify Extraction/lineitems-cleaned/'
             ofilename = (str(today.month) + '-' + str(today.day) + '-' + str(today.year) + 'jp_lineitems_cleaned.json')
@@ -199,7 +205,7 @@ def cleanupLineItems():
         else: print("Returning...")
 
 
-def cleanupProducts():
+def cleanupProducts(admin=False):
     """Cleanup products.json"""
     d = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
     fn = d + 'jp_products.json'
@@ -225,7 +231,7 @@ def cleanupProducts():
         for n in data['products']:  # each element is a distinct customer
             for key in n:
                 if type(n[key]) is list and key == 'variants':  # overwrite with dict values, usually the default addres object.
-                    print('Dictionary found! Folding...')
+                    # print('Dictionary found! Folding...')
                     for obj in n[key]:  # obj is a dictionary
                         newDict = {}
                         newDict['id'] = n['id']
@@ -246,12 +252,15 @@ def cleanupProducts():
                         newDictStorage.append(newDict)  # need to append every variant
 
 
-        print(newDictStorage)
+        # print(newDictStorage)
         # print(json.dumps(newDictStorage, indent=4, sort_keys=True))
 
 
         # Cleanup data so that it can be read by a COPY command using auto
-        c = input("Write data? (y/n): ")
+        if not admin:
+            c = 'y'
+        else:
+            c = input("Write data? (y/n): ")
         if c == 'y':
             ofiledir = '/Users/kevinip/Documents/POST GRAD/PyCharm Projects/kevinip-sandbox/Tasks/Fanjoy Analysis/Queries/Shopify Extraction/products-cleaned/'
             ofilename = (str(today.month) + '-' + str(today.day) + '-' + str(today.year) + 'jp_products_cleaned.json')
@@ -267,31 +276,44 @@ def cleanupProducts():
         else: print("Returning...")
 
 
-def main():
-    while True:
-        c = input("\nChoose an option (q to quit):"
-                  "\n1. EXPORT ALL"
-                  "\n2. Customers"
-                  "\n3. Orders"
-                  "\n4. Products"
-                  "\n5. Line items\n")
-        if c == 'q':
-            print("\nExiting...")
-            time.sleep(1)
-            quit()
-        elif c == '1':
-            cleanupCustomers()
-            cleanupOrders()
-            cleanupProducts()
-            cleanupLineItems()
-            print("\nExiting...")
-            time.sleep(1)
-            quit()
-        elif c == '2': cleanupCustomers()
-        elif c == '3': cleanupOrders()
-        elif c == '4': cleanupProducts()
-        elif c == '5': cleanupLineItems()
-        else: print("Invalid input.")
+def main(choices=None, admin=False):
+    if admin:
+        cleanupCustomers()
+        cleanupOrders()
+        cleanupProducts()
+        cleanupLineItems()
+        print("\nAll nodes have been reformatted properly for Redshift. Returning...")
+        if choices:
+            choices.remove(2)
+        time.sleep(1)
+        return ()
+    else:
+        while True:
+            c = input("\nChoose an option (q to quit):"
+                      "\n1. EXPORT ALL"
+                      "\n2. Customers"
+                      "\n3. Orders"
+                      "\n4. Products"
+                      "\n5. Line items\n")
+            if c == 'q':
+                print("\nExiting...")
+                time.sleep(1)
+                quit()
+            elif c == '1':
+                cleanupCustomers()
+                cleanupOrders()
+                cleanupProducts()
+                cleanupLineItems()
+                print("\nAll nodes have been reformatted properly for Redshift. Returning...")
+                if choices:
+                    choices.remove(2)
+                time.sleep(1)
+                return()
+            elif c == '2': cleanupCustomers()
+            elif c == '3': cleanupOrders()
+            elif c == '4': cleanupProducts()
+            elif c == '5': cleanupLineItems()
+            else: print("Invalid input.")
 
 
 if __name__ == '__main__':
