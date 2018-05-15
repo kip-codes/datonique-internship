@@ -47,6 +47,8 @@ Run *jp_extract.py* without parameters to enable the interactive menus.
 ### Running as admin
 Run *jp_extract.py* with the option **admin** to reveal verbose output options.
 
+
+#### Folding files only
 Alternatively, run *jp_extract_cleanup.py* if you already have .json from Shopify and you only need to fold it.
 
 ## Authors
