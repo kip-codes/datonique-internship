@@ -277,7 +277,7 @@ def cleanupProducts(admin=False):
 
 
 def main(choices=None, admin=False):
-    if admin:
+    if not admin:  # simple run
         cleanupCustomers()
         cleanupOrders()
         cleanupProducts()

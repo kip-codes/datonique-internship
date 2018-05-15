@@ -22,11 +22,18 @@ def strike(text):
     return result
 
 
-def extract(admin=False):
+def extract(credentials=None, admin=False):
     """Main function"""
     # List of nodes to export
     nodes = ['customers', 'orders', 'products']
-    creds = jp_extract.takeCredentials()
+
+    if credentials:
+        with open(credentials, 'r') as infile:
+            if sum(1 for line in infile) == 3:
+                lines = infile.readlines()
+                creds = {'storeurl':lines[1], 'pw':lines[2], 'api_key':lines[3]}
+    else:
+        creds = jp_extract.takeCredentials()
 
 
     while True:
@@ -48,10 +55,10 @@ def extract(admin=False):
             else: pass
 
         # Write to file
-        if not admin:
-            cq1 = 'y'
-        else:
+        if admin:
             cq1 = input("\nWrite to file? (y/n): ")
+        else:
+            cq1 = 'y'
         if cq1 in ('y', 'yes'):
             print("Writing...")
             ofilename = (str(today.month) + '-' + str(today.day) + '-' + str(today.year) + 'jp_' + nodetype + '.json')
@@ -87,13 +94,24 @@ def cleanup(choices, admin=False):
     return jp_clean.main(choices, admin)
 
 
-def uploadToS3():
+def uploadToS3(creds=None):
     print(os.getcwd())
     import boto3
     from botocore.client import Config
 
-    ACCESS_KEY_ID = input("Enter your AWS Access Key:\t")
-    ACCESS_SECRET_KEY = input("Enter your AWS Secret Access Key:\t")
+    if creds:
+        with open(creds, 'r') as infile:
+            if sum(1 for line in infile) == 2:
+                lines = infile.readlines()
+                ACCESS_KEY_ID = lines[1]
+                ACCESS_SECRET_KEY = lines[2]
+            else:
+                print("Improper formatting for AWS credential file. Proceeding to manual input.")
+                ACCESS_KEY_ID = input("Enter your AWS Access Key:\t")
+                ACCESS_SECRET_KEY = input("Enter your AWS Secret Access Key:\t")
+    else:
+        ACCESS_KEY_ID = input("Enter your AWS Access Key:\t")
+        ACCESS_SECRET_KEY = input("Enter your AWS Secret Access Key:\t")
 
     # S3 Connect
     s3 = boto3.resource(
@@ -157,7 +175,7 @@ def removeExtracts():
 if __name__ == '__main__':
     choices = [1,2,3,4]
 
-    # Simple script, automatically complete all procedures
+    # Simple script, automatically complete all procedures but require user input
     if len(sys.argv) == 1:
         extract()
         cleanup(choices)
@@ -195,12 +213,12 @@ if __name__ == '__main__':
             if c == '3': uploadToS3()
             if c == '4': removeExtracts()
 
-    # # Simple script, with all credentials provided.
-    # if len(sys.argv) == 6 and sys.argv[2] != 'admin':
-    #     extract(sys.argv[2], sys.argv[3], sys.argv[4])
-    #     cleanup(choices)
-    #     uploadToS3()
-    #     removeExtracts()
+    # Simple script, with all credentials provided.
+    if len(sys.argv) == 3 and sys.argv[2] != 'admin':
+        extract(sys.argv[2])
+        cleanup(choices)
+        uploadToS3(sys.argv[3])
+        removeExtracts()
 
     else:
         print("usage: <script.py> [store name] [store password] [store API] [AWS access] [AWS secret access]")
