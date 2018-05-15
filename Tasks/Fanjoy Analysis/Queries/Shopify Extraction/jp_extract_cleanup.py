@@ -15,7 +15,7 @@ def cleanupCustomers(admin=False):
     """Cleanup customers.json"""
     d = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
     fn = d + 'jp_customers.json'
-    print(fn)
+    print("Looking for: " + fn)
     try:
         if (os.path.isfile(fn)):
             print("File found! Proceeding to cleanup...")
@@ -42,7 +42,7 @@ def cleanupCustomers(admin=False):
                     # print(newDict[key])
             for key in n:
                 if type(n[key]) is dict and key == 'default_address': # overwrite with dict values, usually the default addres object.
-                    print('Dictionary found! Folding...')
+                    # print('Dictionary found! Folding...')
                     newDict['address1'] = n[key]['address1']
                     newDict['address2'] = n[key]['address2']
                     newDict['city'] = n[key]['city']
@@ -73,7 +73,7 @@ def cleanupCustomers(admin=False):
                     json.dump(obj, f)
                     f.write('\n')
                     objCount += 1
-            print("Write successful. {} objects written.".format(objCount))
+            print("Write successful. {} objects written.\n".format(objCount))
         else: print("Returning...")
 
 
@@ -81,7 +81,7 @@ def cleanupOrders(admin=False):
     """Cleanup orders.json"""
     d = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
     fn = d + 'jp_orders.json'
-    print(fn)
+    print("Looking for: " + fn)
     try:
         if (os.path.isfile(fn)):
             print("File found! Proceeding to cleanup...")
@@ -141,7 +141,7 @@ def cleanupOrders(admin=False):
                     json.dump(obj, f)
                     f.write('\n')
                     objCount += 1
-            print("Write successful. {} objects written.".format(objCount))
+            print("Write successful. {} objects written.\n".format(objCount))
         else: print("Returning...")
 
 
@@ -149,7 +149,7 @@ def cleanupLineItems(admin=False):
     """Cleanup orders.json and extract only line item data"""
     d = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
     fn = d + 'jp_orders.json'
-    print(fn)
+    print("Looking for: " + fn)
     try:
         if (os.path.isfile(fn)):
             print("File found! Proceeding to cleanup...")
@@ -201,15 +201,15 @@ def cleanupLineItems(admin=False):
                     json.dump(obj, f)
                     f.write('\n')
                     objCount += 1
-            print("Write successful. {} objects written.".format(objCount))
-        else: print("Returning...")
+            print("Write successful. {} objects written.\n".format(objCount))
+        else: print("Returning to main menu...")
 
 
 def cleanupProducts(admin=False):
     """Cleanup products.json"""
     d = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
     fn = d + 'jp_products.json'
-    print(fn)
+    print("Looking for: " + fn)
     try:
         if (os.path.isfile(fn)):
             print("File found! Proceeding to cleanup...")
@@ -272,7 +272,7 @@ def cleanupProducts(admin=False):
                     json.dump(obj, f)
                     f.write('\n')
                     objCount += 1
-            print("Write successful. {} objects written.".format(objCount))
+            print("Write successful. {} objects written.\n".format(objCount))
         else: print("Returning...")
 
 
@@ -282,7 +282,7 @@ def main(choices=None, admin=False):
         cleanupOrders()
         cleanupProducts()
         cleanupLineItems()
-        print("\nAll nodes have been reformatted properly for Redshift. Returning...")
+        print("\nAll nodes have been reformatted properly for Redshift. Proceeding to S3 upload...")
         if choices:
             choices.remove(2)
         time.sleep(1)
@@ -304,7 +304,9 @@ def main(choices=None, admin=False):
                 cleanupOrders()
                 cleanupProducts()
                 cleanupLineItems()
-                print("\nAll nodes have been reformatted properly for Redshift. Returning...")
+                print("\nAll nodes have been reformatted properly for Redshift.")
+                if admin:
+                    print("Returning to main menu...\n")
                 if choices:
                     choices.remove(2)
                 time.sleep(1)

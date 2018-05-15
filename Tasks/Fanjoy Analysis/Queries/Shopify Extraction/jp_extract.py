@@ -6,7 +6,7 @@
 # For inquiries about the file please contact the author.
 
 
-import json, requests, datetime, time, os, sys
+import json, requests, datetime, time, os, sys, logging
 import jp_extract_functions as jp_extract
 import jp_extract_cleanup as jp_clean
 import boto3  # upload JSON to S3 Bucket
@@ -22,26 +22,31 @@ def strike(text):
     return result
 
 
-def extract(credentials=None, admin=False):
+def extract(choices=None, credentials=None, admin=False):
     """Main function"""
     # List of nodes to export
     nodes = ['customers', 'orders', 'products']
+    creds = {}
 
     if credentials:
         with open(credentials, 'r') as infile:
-            if sum(1 for line in infile) == 3:
-                lines = infile.readlines()
-                creds = {'storeurl':lines[1], 'pw':lines[2], 'api_key':lines[3]}
+            lines = []
+            for l in infile:
+                lines.append(l)
+            if len(lines) == 3:
+                creds = {'storeurl':lines[0].strip(), 'pw':lines[1].strip(), 'api_key':lines[2].strip()}
     else:
         creds = jp_extract.takeCredentials()
 
+    # Starting message
+    print("Beginning API extraction for store: " + creds['storeurl'] + '.\n')
 
     while True:
-        nodetype = jp_extract.takeNode(nodes)
+        nodetype = jp_extract.takeNode(nodes, admin)
         intermediate_url = jp_extract.makeURL(creds, nodetype)
 
         try:
-            print("Attempting to connect to URL...")
+            print("Attempting to connect to URL for " + nodetype.upper() + "...")
             json_obj = requests.get(intermediate_url, auth=(creds['api_key'], creds['pw']))
         except requests.HTTPError as err:
             print(err,"Connection failure.")
@@ -52,7 +57,6 @@ def extract(credentials=None, admin=False):
             if input("Print results? (y/n): ") in ('y', 'yes'):
                 print('\n', json_obj.headers['content-type'], json_obj.encoding)
                 print(json.dumps(json_obj.json(), indent=4, sort_keys=True))
-            else: pass
 
         # Write to file
         if admin:
@@ -64,7 +68,8 @@ def extract(credentials=None, admin=False):
             ofilename = (str(today.month) + '-' + str(today.day) + '-' + str(today.year) + 'jp_' + nodetype + '.json')
             with open(ofilename, 'w') as ofile:
                 json.dump(json_obj.json(), ofile)
-            print("Write successful.")
+                logging.info(json_obj.json())
+            print("Write successful.\n")
             nodes.remove(nodetype)   # removes the node that has been successfully exported
             if nodes:  # There are still nodes that have not been exported
                 if not admin:
@@ -78,8 +83,9 @@ def extract(credentials=None, admin=False):
                     else:
                         print("Invalid response.")
             else:  # all nodes have been exported
-                print("\nYou have exported all three nodes. Proceeding to cleanup...")
-                choices.remove(1)
+                print("\nAll three nodes have been exported. Proceeding to cleanup...\n")
+                if choices:
+                    choices.remove(1)
                 time.sleep(2)
                 return
         elif cq1 in ('n', 'no'):  # User chooses to exit program
@@ -90,21 +96,27 @@ def extract(credentials=None, admin=False):
             print("Invalid response.")
 
 
-def cleanup(choices, admin=False):
+def cleanup(choices=None, admin=False):
     return jp_clean.main(choices, admin)
 
 
-def uploadToS3(creds=None):
-    print(os.getcwd())
+def uploadToS3(choices=None, credentials=None):
     import boto3
     from botocore.client import Config
 
-    if creds:
-        with open(creds, 'r') as infile:
-            if sum(1 for line in infile) == 2:
-                lines = infile.readlines()
-                ACCESS_KEY_ID = lines[1]
-                ACCESS_SECRET_KEY = lines[2]
+    ACCESS_KEY_ID=''
+    ACCESS_SECRET_KEY=''
+
+    print("Beginning upload to default S3 bucket...\n")
+
+    if credentials:
+        with open(credentials, 'r') as infile:
+            lines = []
+            for l in infile:
+                lines.append(l)
+            if len(lines) == 2:
+                ACCESS_KEY_ID = lines[0].strip()
+                ACCESS_SECRET_KEY = lines[1].strip()
             else:
                 print("Improper formatting for AWS credential file. Proceeding to manual input.")
                 ACCESS_KEY_ID = input("Enter your AWS Access Key:\t")
@@ -145,13 +157,16 @@ def uploadToS3(creds=None):
             # JSON Uploaded
             s3.Bucket(BUCKET_NAME).put_object(Key=KEY, Body=data, ACL='authenticated-read')
             nodes.remove(node)
-            print("\n{} has been successfully uploaded.".format(node))
+            print("{} has been successfully uploaded.".format(node.upper()))
 
-    choices.remove(3)
-    print("\nAll nodes have been successfully uploaded to the bucket " + BUCKET_NAME + ". Returning to main menu...\n")
+    if choices:
+        choices.remove(3)
+    print("\nAll nodes have been successfully uploaded to the bucket '" + BUCKET_NAME + "'. Proceeding to directory cleanup...")
 
 
-def removeExtracts():
+def removeExtracts(choices=None):
+    print("Removing old extracts from your directory...\n")
+
     nodes = ['customers', 'orders', 'products']
     fcount = 0
     for n in nodes:
@@ -165,25 +180,29 @@ def removeExtracts():
         os.remove(fn)
         print(n.upper() + ' has been deleted from your directory.')
         fcount += 1
-    choices.remove(4)
-    print('\n' + str(fcount) + ' files removed. Returning to main menu...\n')
+
+    if choices:
+        choices.remove(4)
+    print('\n{} files removed. Returning to main menu...'.format(str(fcount)))
     time.sleep(1)
 
 
 
 
 if __name__ == '__main__':
+    logging.basicConfig(filename=  'jp_extract' + str(time.time()) + '-debug.log', level=logging.DEBUG)
+
     choices = [1,2,3,4]
 
     # Simple script, automatically complete all procedures but require user input
     if len(sys.argv) == 1:
         extract()
-        cleanup(choices)
+        cleanup()
         uploadToS3()
         removeExtracts()
 
     # Admin ; allow user to choose which procedures to undergo
-    if len(sys.argv) == 2 and sys.argv[2] == 'admin':
+    if len(sys.argv) == 2 and sys.argv[1] == 'admin':
         while True:
             print("\nWould you like to:")
             if 1 in choices:
@@ -208,17 +227,20 @@ if __name__ == '__main__':
                 print("Exiting...")
                 time.sleep(1)
                 quit()
-            if c == '1': extract(admin=True)
+            if c == '1':
+                extract(choices, admin=True)
             if c == '2': cleanup(choices, admin=True)
-            if c == '3': uploadToS3()
-            if c == '4': removeExtracts()
+            if c == '3': uploadToS3(choices)
+            if c == '4': removeExtracts(choices)
 
     # Simple script, with all credentials provided.
-    if len(sys.argv) == 3 and sys.argv[2] != 'admin':
-        extract(sys.argv[2])
-        cleanup(choices)
-        uploadToS3(sys.argv[3])
+    if len(sys.argv) == 3 and sys.argv[1] != 'admin':
+        extract(credentials=sys.argv[1])
+        cleanup()
+        uploadToS3(credentials=sys.argv[2])
         removeExtracts()
 
     else:
         print("usage: <script.py> [store name] [store password] [store API] [AWS access] [AWS secret access]")
+
+    print("Done.")

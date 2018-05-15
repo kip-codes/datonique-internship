@@ -25,9 +25,20 @@ If a connection cannot be established to the storefront API, the script will end
 
 ## Deployment
 
-*jp_extract.py* requires .json files in the same directory it is stored in.
-It will also create a subdirectory for cleaned .json files, if one does not already exist.
+*jp_extract.py* will create temporary .json files in the same directory it is stored in.
+It will also create a subdirectory and store cleaned .json files there, if one does not already exist.
 
+Run *jp_extract.py* with two (2) parameters:
+```
+1. Shopify Credentials, each on a single line
+    * Storefront name
+    * Password to the admin account for this store
+    * API Key
+2. AWS Credentials, each on a single line
+    * AWS Access Key
+    * AWS Secret Access Key
+```
+Otherwise, running without parameters will take the user through interactive menus and output will be more verbose.
 
 Alternatively, run *jp_extract_cleanup.py* if you already have .json from Shopify and you only need to fold it.
 

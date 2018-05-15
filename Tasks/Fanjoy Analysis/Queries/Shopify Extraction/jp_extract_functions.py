@@ -49,32 +49,37 @@ def takeCredentials():
             else:
                 print("Invalid value. Please enter 'retry' or 'done'.")
 
-def takeNode(nodes):
-    while True:
-        print("\nEnter which of the following nodes you would like to access:")
-        if 'customers' in nodes:
-            print("1. Customers")
-        else: # customers has been exported already
-            print(strike("1. Customers"))
-        if 'orders' in nodes:
-            print("2. Orders")
-        else: # orders has been exported already
-            print(strike("2. Orders"))
-        if 'products' in nodes:
-            print("3. Products")
-        else: # products has been exported already
-            print(strike("3. Products"))
+def takeNode(nodes, admin=False):
+    if admin:
+        while True:
+            print("\nEnter which of the following nodes you would like to access:")
+            if 'customers' in nodes:
+                print("1. Customers")
+            else: # customers has been exported already
+                print(strike("1. Customers"))
+            if 'orders' in nodes:
+                print("2. Orders")
+            else: # orders has been exported already
+                print(strike("2. Orders"))
+            if 'products' in nodes:
+                print("3. Products")
+            else: # products has been exported already
+                print(strike("3. Products"))
 
-        nodetype = input('\n')
-        # Convert nodetype to string
-        if nodetype in ('1', 'customers'):
-            return 'customers'
-        elif nodetype in ('2', 'orders'):
-            return 'orders'
-        elif nodetype in ('3', 'products'):
-            return 'products'
-        else:
-            print("Invalid node type. Please enter the numerical value of the categories above.")
+            nodetype = input('\n')
+            # Convert nodetype to string
+            if nodetype in ('1', 'customers'):
+                return 'customers'
+            elif nodetype in ('2', 'orders'):
+                return 'orders'
+            elif nodetype in ('3', 'products'):
+                return 'products'
+            else:
+                print("Invalid node type. Please enter the numerical value of the categories above.")
+    else:
+        if nodes:
+            return nodes[0]
+
 
 
 def takeExportNode(nodes):
