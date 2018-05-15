@@ -2,6 +2,8 @@
 
 This extraction process will pull the most important data from the Shopify API, particularly from the nodes of Customers, Orders, and Products.
 
+__________
+
 ## Getting Started
 
 Simply run *jp_extract.py* and follow the instructions to extract specific or all nodes.
@@ -50,6 +52,8 @@ Run *jp_extract.py* with the option **admin** to reveal verbose output options.
 
 #### Folding files only
 Alternatively, run *jp_extract_cleanup.py* if you already have .json from Shopify and you only need to fold it.
+
+__________
 
 ## Authors
 
