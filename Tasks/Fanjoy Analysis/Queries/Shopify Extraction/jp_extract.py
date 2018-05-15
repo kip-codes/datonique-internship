@@ -116,12 +116,33 @@ def uploadToS3():
     print("\nDone")
 
 
+def removeExtracts():
+    nodes = ['customers', 'orders', 'products']
+    fcount = 0
+    for n in nodes:
+        try:
+            fn = todayfn + 'jp_' + n + '.json'
+            f = open(fn)
+            f.close()
+        except FileNotFoundError:
+            print('\nFile for ' + n.upper() + ' does not exist.')
+            continue
+        os.remove(fn)
+        print(n.upper() + ' has been deleted from your directory.')
+        fcount += 1
+    print('\n' + str(fcount) + ' files removed. Returning to main menu...\n')
+    time.sleep(1)
+
+
+
+
 if __name__ == '__main__':
     while True:
         c = input("Would you like to:"
                   "\n1. Extract JSON from API"
                   "\n2. Clean up JSON for Redshift"
                   "\n3. Upload reformatted JSON to S3"
+                  "\n4. Delete raw JSON exports from local directory"
                   "\n('q' to exit)\n")
         if c == 'q':
             print("Exiting...")
@@ -130,3 +151,4 @@ if __name__ == '__main__':
         if c == '1': extract()
         if c == '2': cleanup()
         if c == '3': uploadToS3()
+        if c == '4': removeExtracts()
