@@ -28,6 +28,7 @@ If a connection cannot be established to the storefront API, the script will end
 *jp_extract.py* will create temporary .json files in the same directory it is stored in.
 It will also create a subdirectory and store cleaned .json files there, if one does not already exist.
 
+### Simple Execution, with parameters
 Run *jp_extract.py* with two (2) parameters:
 ```
 1. Shopify Credentials, each on a single line
@@ -38,7 +39,13 @@ Run *jp_extract.py* with two (2) parameters:
     - AWS Access Key
     - AWS Secret Access Key
 ```
-Otherwise, running without parameters will take the user through interactive menus and output will be more verbose.
+
+### Simple execution, without parameters
+Run *jp_extract.py* without parameters to enable the interactive menus.
+
+
+### Running as admin
+Run *jp_extract.py* with the option **admin** to reveal verbose output options.
 
 Alternatively, run *jp_extract_cleanup.py* if you already have .json from Shopify and you only need to fold it.
 
