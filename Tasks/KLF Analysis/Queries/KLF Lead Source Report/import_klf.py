@@ -50,16 +50,18 @@ def uploadToS3(credentials=None):
     BUCKET_NAME = 'kevin-ip'
 
     # Get name of .csv file(s) in directory
-    onlyfiles = [f for f in os.listdir('Reports/') if os.path.isfile(os.path.join('Reports/', f))]
+    onlyfiles = [f for f in os.listdir('Reports/') if not f.startswith('.') and os.path.isfile(os.path.join('Reports/', f))]
+
+    if not onlyfiles:  # empty directory
+        print("There are no files in the Reports directory to be uploaded.")
+        return
+
     print(onlyfiles)
 
     objCount = 0
     for n,f in enumerate(onlyfiles):  # only 1 expected, but may take more
         # This is the subdirectory path inside the S3 Bucket, ending in the desired file name for S3
-        if len(onlyfiles) == 1:
-            KEY = 'KLF/' + todayfn + 'Leads-Source-Report.csv'
-        else:  # more than 1 file in input directory
-            KEY = 'KLF/' + todayfn + 'Leads-Source-Report-' + str(n+1) + '.csv'
+        KEY = 'KLF/' + f
 
         # This is the local path to the file(s) you want to upload.
         FILE_NAME = 'Reports/' + f
@@ -83,6 +85,9 @@ def uploadToS3(credentials=None):
 
 
 def main():
+    logging.basicConfig(filename=__name__ + str(time.time()) + '-debug.log', level=logging.DEBUG)
+
+
     uploadToS3()
 
 
