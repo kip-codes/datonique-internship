@@ -49,28 +49,36 @@ def uploadToS3(credentials=None):
     # This is the name of the bucket on S3.
     BUCKET_NAME = 'kevin-ip'
 
-    # This is the subdirectory path inside the S3 Bucket, ending in the desired file name for S3
-    KEY = 'KLF/' + todayfn + 'Leads-Source-Report.csv'
-
-    # Get name of .csv file in directory
+    # Get name of .csv file(s) in directory
     onlyfiles = [f for f in os.listdir('Reports/') if os.path.isfile(os.path.join('Reports/', f))]
     print(onlyfiles)
 
-    # This is the local path to the file you want to upload.
-    FILE_NAME = 'Reports/' + todayfn + '_Leads-Source-Report.csv'
-    try:
-        data = open(FILE_NAME, 'rb')  # check if file exists
-    except:
-        print("WARNING: A valid file for " + FILE_NAME + " was not found. Exiting...")
-        time.sleep(1)
-        return
+    objCount = 0
+    for n,f in enumerate(onlyfiles):  # only 1 expected, but may take more
+        # This is the subdirectory path inside the S3 Bucket, ending in the desired file name for S3
+        if len(onlyfiles) == 1:
+            KEY = 'KLF/' + todayfn + 'Leads-Source-Report.csv'
+        else:  # more than 1 file in input directory
+            KEY = 'KLF/' + todayfn + 'Leads-Source-Report-' + str(n+1) + '.csv'
 
-    data = open(FILE_NAME, 'rb')
-    # CSV Uploaded
-    s3.Bucket(BUCKET_NAME).put_object(Key=KEY, Body=data, ACL='authenticated-read')
-    print("{} has been successfully uploaded.".format(FILE_NAME))
+        # This is the local path to the file(s) you want to upload.
+        FILE_NAME = 'Reports/' + f
+        try:
+            data = open(FILE_NAME, 'rb')  # check if file exists
+        except:
+            print("WARNING: A valid file for " + FILE_NAME + " was not found. Exiting...")
+            time.sleep(1)
+            return
 
-    print("\nAll nodes have been successfully uploaded to the bucket '" + BUCKET_NAME + "'.")
+        data = open(FILE_NAME, 'rb')
+
+        # CSV Upload
+        s3.Bucket(BUCKET_NAME).put_object(Key=KEY, Body=data, ACL='authenticated-read')
+        print("{} has been successfully uploaded.".format(f))
+        objCount += 1
+
+    print("\n" + str(objCount) + " files uploaded.")
+    print("All nodes have been successfully uploaded to the bucket '" + BUCKET_NAME + "'.")
 
 
 
@@ -79,4 +87,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    uploadToS3(sys.argv[1])
