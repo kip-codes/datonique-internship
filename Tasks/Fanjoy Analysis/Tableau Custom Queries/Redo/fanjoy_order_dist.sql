@@ -241,13 +241,15 @@ FROM
 (
   select
   A.customer_id,
+  date,
   count(B.order_number) as total_orders,
   sum(B.total_sales) as total_sales
   from
     (
       select distinct
         customer_id,
-        order_number
+        order_number,
+        date_trunc('month', created_at) as date
       from fod_team10_nojake
     ) as A
   join
@@ -259,7 +261,7 @@ FROM
     group by 1
     ) as B
   on A.order_number = B.order_number
-  group by 1
+  group by 1,2
 ) as data
 group by 1
 order by 1

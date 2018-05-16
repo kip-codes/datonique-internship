@@ -45,3 +45,4 @@ group BY 1
 select *
 FROM fanjoy_customers_data
 WHERE id = 1543;
+

@@ -1,3 +1,26 @@
+----------------------------------------------------------------
+/*
+  Get count of paying Fanjoy customers that have valid emails
+ */
+----------------------------------------------------------------
+
+SELECT count(distinct customer_id)
+from fanjoy_orders_data
+where
+  total_price > 0
+  and email is not NULL
+;
+
+
+----------------------------------------------------------------
+/*
+  Get count of active Edfluence subscribers
+ */
+----------------------------------------------------------------
+
+
+-- GO TO EDFLUENCE DATABASE
+
 
 ---------------------------------------------------------------
 -- Get Fanjoy and Edfluence Overlap
@@ -10,6 +33,7 @@ SELECT DISTINCT
   trim(lower(C.email)) as email,
   C.phone,
   trim(initcap(C.country)) as country,
+  trim(initcap(C.province)) as province,
   trim(initcap(C.city)) as city,
   initcap(C.address1) as address1,
   initcap(C.address2) as address2,
@@ -21,26 +45,33 @@ FROM
   (
     SELECT DISTINCT
       customer_id,
-      customer_email as email,
       count(distinct id) as num_orders,
-      sum(total_price) as total_price_fromorders,
-      min(created_at) as minorderdate
+      sum(total_price) as total_price_fromorders
     FROM fanjoy_orders_data
     WHERE
       customer_email not ilike '%fanjoy.co%'
       AND customer_email is not NULL
       AND total_price > 0
-    group by 1,2
+    group by 1
   ) as A
   JOIN
   (
     SELECT DISTINCT
-      *
+      id,
+      first_name,
+      last_name,
+      email,
+      phone,
+      country,
+      province,
+      city,
+      address1,
+      address2
     FROM fanjoy_customers_data
   ) AS C
   on a.customer_id = c.id
-WHERE trim(lower(A.email)) IN (
-  SELECT email
+WHERE trim(lower(C.email)) IN (
+  SELECT trim(lower(email))
   FROM kevin_ip.edfluence_active
 )
 ;
@@ -119,12 +150,17 @@ order by 1;
 --------------------------------------------------------------------------------
 
 
-SELECT COUNT(DISTINCT lower(email))
+SELECT COUNT(DISTINCT trim(lower(email)))
 FROM fanjoy_orders_data
 WHERE
   total_price > 0
 ;
 
+
+SELECT count(DISTINCT customer_id)
+FROM fanjoy_orders_data
+WHERE total_price > 0 AND email is not null
+;
 
 select COUNT(DISTINCT phone)
 FROM fanjoy_customers_data

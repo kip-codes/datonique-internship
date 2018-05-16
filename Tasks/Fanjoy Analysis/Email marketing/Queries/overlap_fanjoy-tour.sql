@@ -1,29 +1,66 @@
+----------------------------------------------------------------------
+/*
+  Get count of tour update subscribers
+ */
+----------------------------------------------------------------------
+select COUNT(*)
+from kevin_ip.jakepaul_tourupdates;
+
+
+
 
 -- Get Fanjoy and Tour Overlap
 -- Get Fanjoy customers that have placed orders
 SELECT DISTINCT
-  A.customer_id as cid,
-  lower(email) as email,
-  MIN(date_trunc('day', A.created_at)) as orderdate
+  id,
+  initcap(C.first_name) as first_name,
+  initcap(C.last_name) as last_name,
+  trim(lower(C.email)) as email,
+  C.phone,
+  trim(initcap(C.country)) as country,
+  trim(initcap(C.province)) as province,
+  trim(initcap(C.city)) as city,
+  initcap(C.address1) as address1,
+  initcap(C.address2) as address2,
+--   C.orders_count,
+  A.num_orders,
+--   C.total_spent,
+  A.total_sales_fromorders
 FROM
   (
     SELECT DISTINCT
       customer_id,
-      customer_email as email,
-      created_at
+      count(distinct id) as num_orders,
+      sum(total_price) as total_sales_fromorders
     FROM fanjoy_orders_data
     WHERE
       customer_email not ilike '%fanjoy.co%'
       AND customer_email IS NOT NULL
       AND total_price > 0
-    ORDER BY created_at
+
+    GROUP BY 1
   ) as A
-WHERE lower(email) IN
+  JOIN
+  (
+    SELECT DISTINCT
+      id,
+      first_name,
+      last_name,
+      email,
+      phone,
+      country,
+      province,
+      city,
+      address1,
+      address2
+    FROM fanjoy_customers_data
+  ) AS C
+  on a.customer_id = c.id
+WHERE trim(lower(email)) IN
       (
-        select distinct LOWER(email)
+        select distinct trim(LOWER(email))
         FROM kevin_ip.jakepaul_tourupdates
       )
-GROUP BY 1,2
 ;
 
 

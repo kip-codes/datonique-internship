@@ -77,3 +77,13 @@ FROM
   ON A.order_number = B.order_number
 WHERE B.total_sales > 0
 ;
+
+SELECT * from jakepaul_optin where opted_in = 1;
+
+
+SELECT count(distinct customer_id)
+from fanjoy_orders_data
+where
+  total_price > 0
+  and email is not NULL
+;

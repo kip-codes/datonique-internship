@@ -1,7 +1,7 @@
 
 -- Get all active users
 SELECT
-  user_id
+  count(user_id)
 FROM
   wp_pmpro_memberships_users
 WHERE status = 'active'

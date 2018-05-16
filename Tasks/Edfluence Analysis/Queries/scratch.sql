@@ -521,3 +521,6 @@ SELECT * from payments_stripe;
 SELECT * FROM subscription_data_old;
 
 
+SELECT * from subscription_data_merged_v2
+ORDER BY date DESC
+limit 10;
