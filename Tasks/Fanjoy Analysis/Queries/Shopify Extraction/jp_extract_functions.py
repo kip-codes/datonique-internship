@@ -38,10 +38,9 @@ def takeCredentials():
         api_key = input("Enter the API key for this page:\t")
         print(txt.UNDERLINE + "Your current string is:\n" + txt.END + api_key + ':' + pw + '@' + storeurl + '\n')
 
-        print(txt.UNDERLINE + "Your current string is:\n" + txt.END + 'https://' + api_key + ':' + pw + '@' + storeurl + '.myshopify.com/admin/<node-type>.json\n')
-        print("If you would like to revise the URL, enter " + txt.BOLD + 'retry.' + txt.END)
-
         while True:
+            print(txt.UNDERLINE + "Your current string is:\n" + txt.END + 'https://' + api_key + ':' + pw + '@' + storeurl + '.myshopify.com/admin/<node-type>.json\n')
+            print("If you would like to revise the URL, enter " + txt.BOLD + 'retry.' + txt.END)
             q = input("If you are satisfied with this URL, enter " + txt.BOLD + 'done' + txt.END + ":\t")
             if q == 'done':
                 return {'storeurl':storeurl, 'pw':pw, 'api_key':api_key}
