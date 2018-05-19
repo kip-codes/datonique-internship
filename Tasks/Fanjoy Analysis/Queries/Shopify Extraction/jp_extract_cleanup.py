@@ -77,6 +77,39 @@ def cleanupCustomers(admin=False):
         else: print("Returning...")
 
 
+def cleanupCustomers_lambda(json_obj, admin=False):
+    """Cleanup customers.json"""
+    data = json_obj
+
+    # Define a new list to contain collapsed dictionaries from source
+    newDictStorage = []
+
+    # Print data to be cleaned up
+    for n in data['customers']: # each element is a distinct customer
+        newDict = {}
+        for key in n: # list of left hand keys
+            if type(n[key]) is not dict and type(n[key]) is not list: # valid folding
+                # print(type(n[key]), key, n[key])
+                newDict[key] = n[key]
+                # print(newDict[key])
+        for key in n:
+            if type(n[key]) is dict and key == 'default_address': # overwrite with dict values, usually the default addres object.
+                # print('Dictionary found! Folding...')
+                newDict['address1'] = n[key]['address1']
+                newDict['address2'] = n[key]['address2']
+                newDict['city'] = n[key]['city']
+                newDict['company'] = n[key]['company']
+                newDict['country'] = n[key]['country']
+                newDict['default'] = n[key]['default']
+                newDict['phone'] = n[key]['phone']
+                newDict['province'] = n[key]['province']
+                newDict['zip'] = n[key]['zip']
+        newDictStorage.append(newDict)
+
+    return newDictStorage
+
+
+
 def cleanupOrders(admin=False):
     """Cleanup orders.json"""
     d = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
@@ -145,6 +178,10 @@ def cleanupOrders(admin=False):
         else: print("Returning...")
 
 
+def cleanupOrders_lambda(admin=False):
+    return
+
+
 def cleanupLineItems(admin=False):
     """Cleanup orders.json and extract only line item data"""
     d = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
@@ -204,6 +241,9 @@ def cleanupLineItems(admin=False):
             print("Write successful. {} objects written.\n".format(objCount))
         else: print("Returning to main menu...")
 
+
+def cleanupLineItems_lambda(admin=False):
+    return
 
 def cleanupProducts(admin=False):
     """Cleanup products.json"""
@@ -274,6 +314,10 @@ def cleanupProducts(admin=False):
                     objCount += 1
             print("Write successful. {} objects written.\n".format(objCount))
         else: print("Returning...")
+
+
+def cleanupProducts_lambda(admin=False):
+    return
 
 
 def main(choices=None, admin=False):
