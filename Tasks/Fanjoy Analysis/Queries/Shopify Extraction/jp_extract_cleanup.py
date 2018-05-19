@@ -109,7 +109,6 @@ def cleanupCustomers_lambda(json_obj, admin=False):
     return newDictStorage
 
 
-
 def cleanupOrders(admin=False):
     """Cleanup orders.json"""
     d = str(today.month) + '-' + str(today.day) + '-' + str(today.year)
@@ -178,8 +177,35 @@ def cleanupOrders(admin=False):
         else: print("Returning...")
 
 
-def cleanupOrders_lambda(admin=False):
-    return
+def cleanupOrders_lambda(json_obj, admin=False):
+    """Cleanup orders.json"""
+    data = json_obj
+
+    # Define a new list to contain collapsed dictionaries from source
+    newDictStorage = []
+
+    # Print data to be cleaned up
+    for n in data['orders']:  # each element is a distinct customer
+        newDict = {}
+        for key in n:  # list of left hand keys
+            if type(n[key]) is not dict and type(n[key]) is not list:  # valid folding
+                # print(type(n[key]), key, n[key])
+                newDict[key] = n[key]
+                # print(newDict[key])
+        for key in n:
+            if type(n[key]) is dict and key == 'customer':  # overwrite with dict values, usually the default addres object.
+                # print('Dictionary found! Folding...')
+                newDict['customer_id'] = n[key]['id']
+                newDict['customer_email'] = n[key]['email']
+                newDict['customer_created_at'] = n[key]['created_at']
+                newDict['customer_updated_at'] = n[key]['updated_at']
+                newDict['customer_first_name'] = n[key]['first_name']
+                newDict['customer_last_name'] = n[key]['last_name']
+                newDict['customer_orders_count'] = n[key]['orders_count']
+                newDict['customer_total_spent'] = n[key]['total_spent']
+        newDictStorage.append(newDict)
+
+    return newDictStorage
 
 
 def cleanupLineItems(admin=False):
@@ -242,8 +268,29 @@ def cleanupLineItems(admin=False):
         else: print("Returning to main menu...")
 
 
-def cleanupLineItems_lambda(admin=False):
-    return
+def cleanupLineItems_lambda(json_obj, admin=False):
+    """Cleanup orders.json and extract only line item data"""
+    data = json_obj
+
+    # Define a new list to contain collapsed dictionaries from source
+    newDictStorage = []
+
+    # Print data to be cleaned up
+    for n in data['orders']:  # each element is a distinct customer
+        for key in n:
+            if type(n[key]) is list and key == 'line_items':
+                for obj in n[key]:  # obj is a dictionary
+                    newDict = {}
+                    newDict['order_number'] = n['order_number']
+                    for k in obj:  # k is the key inside each line item
+                        if type(obj[k]) is not dict and type(obj[k]) is not list:
+                            newDict[k] = obj[k]
+
+                    # After every key in this specific line item has been processed, append to object
+                    newDictStorage.append(newDict)
+
+    return newDictStorage
+
 
 def cleanupProducts(admin=False):
     """Cleanup products.json"""
@@ -316,8 +363,38 @@ def cleanupProducts(admin=False):
         else: print("Returning...")
 
 
-def cleanupProducts_lambda(admin=False):
-    return
+def cleanupProducts_lambda(json_obj, admin=False):
+    """Cleanup products.json"""
+    data = json_obj
+
+    # Define a new list to contain collapsed dictionaries from source
+    newDictStorage = []
+
+    # Print data to be cleaned up
+    for n in data['products']:  # each element is a distinct customer
+        for key in n:
+            if type(n[key]) is list and key == 'variants':  # overwrite with dict values, usually the default addres object.
+                # print('Dictionary found! Folding...')
+                for obj in n[key]:  # obj is a dictionary
+                    newDict = {}
+                    newDict['id'] = n['id']
+                    newDict['title'] = n['title']
+                    newDict['vendor'] = n['vendor']
+                    newDict['product_type'] = n['product_type']
+                    newDict['created_at'] = n['created_at']
+                    newDict['handle'] = n['handle']
+                    newDict['updated_at'] = n['updated_at']
+                    newDict['published_at'] = n['published_at']
+                    newDict['tags'] = n['tags']
+                    newDict['variant_id'] = obj['id']
+                    newDict['variant_product_id'] = obj['product_id']
+                    newDict['variant_title'] = obj['title']
+                    newDict['variant_price'] = obj['price']
+                    newDict['variant_sku'] = obj['sku']
+                    newDict['variant_taxable'] = obj['taxable']
+                    newDictStorage.append(newDict)  # need to append every variant
+
+    return newDictStorage
 
 
 def main(choices=None, admin=False):
