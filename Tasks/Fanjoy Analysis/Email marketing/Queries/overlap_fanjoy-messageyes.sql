@@ -7,8 +7,7 @@ SELECT count(distinct B.phone)
 FROM (
     (
       SELECT
-        order_number,
-        customer_id
+        DISTINCT customer_id
       FROM fanjoy_orders_data
       WHERE total_price > 0
     ) A
@@ -26,7 +25,7 @@ FROM (
 
 ----------------------------------------------------------------------
 /*
-  Get count of tour update subscribers
+  Get count of MessageYes opt-in subscribers
  */
 ----------------------------------------------------------------------
 select COUNT(distinct phone_number)
@@ -63,9 +62,7 @@ FROM
       sum(total_price) as total_sales_fromorders
     FROM fanjoy_orders_data
     WHERE
-      customer_email not ilike '%fanjoy.co%'
-      AND customer_email is not NULL
-      AND total_price > 0
+      total_price > 0
     group by 1
   ) as A
   JOIN
@@ -82,6 +79,9 @@ FROM
       address1,
       address2
     FROM fanjoy_customers_data
+    WHERE
+      email not ilike '%fanjoy.co%'
+      AND phone IS NOT NULL
   ) AS C
   on A.customer_id = C.id
 WHERE regexp_replace(C.phone, '[^0-9]+', '') IN (
