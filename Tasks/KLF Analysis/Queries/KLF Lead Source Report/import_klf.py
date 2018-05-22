@@ -61,7 +61,7 @@ def uploadToS3(credentials=None):
     objCount = 0
     for n,f in enumerate(onlyfiles):  # only 1 expected, but may take more
         # This is the subdirectory path inside the S3 Bucket, ending in the desired file name for S3
-        KEY = 'KLF/' + f
+        KEY = 'klf/' + f
 
         # This is the local path to the file(s) you want to upload.
         FILE_NAME = 'Reports/' + f
