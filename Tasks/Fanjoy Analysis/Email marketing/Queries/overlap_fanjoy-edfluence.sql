@@ -49,9 +49,7 @@ FROM
       sum(total_price) as total_price_fromorders
     FROM fanjoy_orders_data
     WHERE
-      customer_email not ilike '%fanjoy.co%'
-      AND customer_email is not NULL
-      AND total_price > 0
+      total_price > 0
     group by 1
   ) as A
   JOIN
@@ -68,6 +66,8 @@ FROM
       address1,
       address2
     FROM fanjoy_customers_data
+    WHERE
+      email IS NOT NULL and email NOT ILIKE '%fanjoy%'
   ) AS C
   on a.customer_id = c.id
 WHERE trim(lower(C.email)) IN (
