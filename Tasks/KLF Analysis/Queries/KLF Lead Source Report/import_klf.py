@@ -16,7 +16,7 @@ def get_S3_Key():
     s3 = boto3.client('s3')
 
     # This is the name of the bucket on S3.
-    BUCKET = 'kevin-ip'
+    BUCKET = 'kevin-ip-datonique'
 
     # This is the subdirectory and file headers within the bucket you wish to limit the search to.
     PREFIX = 'klf/Leads'
@@ -94,12 +94,17 @@ def s3_to_redshift_write(key, copy, delete = None):
 
 def lambda_handler(event=None, context=None):
     """Get the latest file from S3 and COPY into Redshift."""
+    import time
+    start_time = time.time()
 
     s3array = get_S3_Key()
 
     print(s3array)
 
     load_psql_query(s3array)
+
+
+    print("--- %s seconds ---" % (time.time() - start_time))
 
 
 if __name__ == '__main__':
