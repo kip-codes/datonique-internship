@@ -18,7 +18,12 @@ FROM(
   from public.klaviyo_orders_data
   group by 1
 ) data
-WHERE min_date >= CURRENT_DATE - INTERVAL '90 DAY'
+WHERE
+  min_date >= CURRENT_DATE - INTERVAL '90 DAY'
+  AND trim(lower(email)) IN (
+    select distinct trim(lower(email))
+    from kevin_ip.fod_jakepaul
+  )
 ;
 
 
@@ -45,7 +50,12 @@ FROM (
   FROM public.klaviyo_orders_data
   GROUP BY 1
 ) data
-WHERE v > 100 and v < 250
+WHERE
+  v >= 100 and v < 250
+  AND trim(lower(email)) IN (
+    select distinct trim(lower(email))
+    from kevin_ip.fod_jakepaul
+  )
 ;
 
 
@@ -60,7 +70,12 @@ FROM (
   FROM public.klaviyo_orders_data
   GROUP BY 1
 ) data
-WHERE v > 250 and v < 500
+WHERE
+  v >= 250 and v < 500
+  AND trim(lower(email)) IN (
+    select distinct trim(lower(email))
+    from kevin_ip.fod_jakepaul
+  )
 ;
 
 
@@ -75,10 +90,38 @@ FROM (
   FROM public.klaviyo_orders_data
   GROUP BY 1
 ) data
-WHERE v > 500
+WHERE
+  v >= 500
+  AND trim(lower(email)) IN (
+    select distinct trim(lower(email))
+    from kevin_ip.fod_jakepaul
+  )
 ;
 
 
 /*
-  Abandoned Cart last 90 days
+  All time purchasers, no purchase last 90 days
  */
+SELECT DISTINCT TRIM(LOWER(email))
+FROM public.klaviyo_orders_data
+WHERE trim(lower(email)) IN (
+    select distinct trim(lower(email))
+    from kevin_ip.fod_jakepaul
+  )
+GROUP BY 1
+HAVING max(order_datetime) < current_date - INTERVAL '90 days'
+;
+
+
+/*
+  1+ Orders in US
+ */
+SELECT DISTINCT
+  email
+FROM klaviyo_orders_data
+WHERE trim(lower(email)) IN (
+    select distinct trim(lower(email))
+    from kevin_ip.fod_jakepaul
+  )
+GROUP BY 1
+HAVING count(order_datetime) >= 1
