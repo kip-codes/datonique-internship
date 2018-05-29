@@ -7,7 +7,6 @@
 
 import psycopg2
 import pymysql
-import csv
 import boto3
 from botocore.client import Config
 import os, io, datetime
