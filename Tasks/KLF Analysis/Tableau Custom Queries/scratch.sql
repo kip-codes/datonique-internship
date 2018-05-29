@@ -32,3 +32,38 @@ GROUP BY
 order by
   date_part('week', date_created_pst::date),
   date_part('year', date_created_pst::date)
+
+
+
+
+SELECT
+  id,
+  name,
+  phone1,
+  date_created_pst,
+  owner,
+  date_retained,
+  replace(replace(retainer_amount, '$', ''), ',', '') as retainer_amt,
+  replace(replace(downpay, '$', ''), ',', '') as downpay,
+  type,
+  channel,
+  campaign,
+  county_of_arrest,
+  offense,
+  radio_tv_internet
+FROM klf.leads_source_report
+;
+
+
+SELECT
+  retainer_amount
+FROM klf.leads_source_report
+where
+  extract(year from date_created_pst) = 2018
+  AND campaign ilike '%findlaw%'
+  and retainer_amount != ''
+;
+
+
+
+select DISTINCT "where_did_you_find_us?" from klf.contacts;
