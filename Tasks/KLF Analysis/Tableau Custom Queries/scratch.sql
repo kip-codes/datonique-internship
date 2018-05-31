@@ -66,4 +66,11 @@ where
 
 
 
+SELECT
+  *
+from klf.leads_source_report
+order by date_created_pst desc
+LIMIT 100
+;
+
 select DISTINCT "where_did_you_find_us?" from klf.contacts;
