@@ -44,6 +44,7 @@ SELECT
   ) as total_sales,
   (SELECT sum(price) FROM fld_jakepaul) / count(distinct order_number) as avg_order_size
 FROM fod_jakepaul
+WHERE created_at <= current_date - interval '4 month'
 ;
 
 -- LTD Team 10, excl. Jake
