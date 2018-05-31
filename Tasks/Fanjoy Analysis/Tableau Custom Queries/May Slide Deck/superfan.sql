@@ -34,65 +34,196 @@ order by total_orders
 
 
 /*
-  Median time between sales for 5+ orders
+  Verify median data
+ */
+-- For each order count, get the median sales (per customer)
+SELECT
+  total_orders,
+  count(customer_id) as num_cust,
+  sum(sales_per_cust) as total_sales,
+  MEDIAN(sales_per_cust) as median_order_size
+FROM
+  (
+    -- For each customer, get total orders and total sales placed
+    SELECT
+      A.customer_id,
+      count(B.order_number) AS total_orders,
+      sum(B.total_sales)    AS sales_per_cust
+    FROM
+      (SELECT
+         customer_id,
+         order_number
+       FROM fod_jakepaul
+      ) A
+      JOIN
+      (SELECT
+         order_number,
+         sum(price) AS total_sales
+       FROM fld_jakepaul
+       GROUP BY order_number
+      ) B
+        ON A.order_number = B.order_number
+    WHERE customer_id IS NOT NULL AND customer_id != 0
+    GROUP BY 1
+  ) data
+WHERE total_orders >= 5
+group by 1
+ORDER BY 1
+;
+
+
+
+
+/*
+  Median time between sales for customers with EXACTLY 5 orders
  */
 
--- Jake Paul, only
-
+-- Get customers with exactly 5 orders
 SELECT
---   newest_purch.customer_id,
---   newest_purch.orders_count,
---   newest_purch_date as newest,
---   prev_purch_date as previous,
-  newest_purch.orders_count,
-  COUNT(DISTINCT newest_purch.customer_id) as num_cust, -- Sample size for average
-  AVG(EXTRACT(DAY FROM newest_purch_date-prev_purch_date)) as avg_diff_days
-FROM (
-  SELECT *
-  FROM (
+  cid,
+  count(orderdate) as num_orders
+FROM
+(
+  select
+    A.customer_id cid,
+    A.created_at orderdate
+  FROM
+    (SELECT customer_id, order_number, created_at
+      FROM kevin_ip.fod_jakepaul
+    ) A
+    JOIN
+    (SELECT
+      order_number,
+      sum(price) as total_sales
+      FROM kevin_ip.fld_jakepaul
+      GROUP BY order_number
+    ) B
+    on A.order_number = B.order_number
+  WHERE customer_id IS NOT NULL and customer_id != 0
+) data
+GROUP BY 1
+HAVING count(orderdate) = 5
+order by 1
+;
+
+
+-- For those customers, rank each order and get the previous order date
+SELECT
+  customer_id cid,
+  created_at,
+  total_sales,
+  lag(created_at) over (PARTITION BY customer_id ORDER BY created_at) as prev_date,
+  lag(total_sales) over (PARTITION BY customer_id ORDER BY created_at) as prev_sales,
+  RANK() OVER (PARTITION BY customer_id ORDER BY created_at) AS order_rank
+FROM
+  (
     SELECT
-      A.customer_id,
-      B.num_orders as orders_count,
-      A.order_number,
-      A.created_at newest_purch_date,
-      rank() over (PARTITION BY A.customer_id ORDER BY A.created_at DESC) as rank
-    FROM fod_jakepaul A
-    JOIN (
-        SELECT DISTINCT
-          f2.customer_id,
-          count(distinct f2.order_number) as num_orders
-        FROM fod_jakepaul f2
-        GROUP BY f2.customer_id
-        ) AS B
-      ON A.customer_id = B.customer_id
-    WHERE A.customer_id > 0 AND A.customer_id IS NOT NULL
-  ) t
-  WHERE rank = 1 and orders_count > 1
-  ORDER BY customer_id
-) newest_purch
-JOIN (
-  SELECT *
-  FROM (
+      customer_id,
+      created_at,
+      order_number
+    FROM kevin_ip.fod_jakepaul
+  ) fod
+  JOIN
+  (
     SELECT
-      A.customer_id,
-      B.num_orders as orders_count,
-      A.order_number,
-      A.created_at prev_purch_date,
-      rank() over (PARTITION BY A.customer_id ORDER BY A.created_at DESC) as rank
-    FROM fod_jakepaul A
-    JOIN (
-        SELECT DISTINCT
-          f2.customer_id,
-          count(distinct f2.order_number) as num_orders
-        FROM fod_jakepaul f2
-        GROUP BY f2.customer_id
-        ) AS B
-      ON A.customer_id = B.customer_id
-    WHERE A.customer_id > 0 AND A.customer_id IS NOT NULL
-  ) t
-  WHERE rank = 2 and orders_count > 1
-  ORDER BY customer_id
-) prev_purch
-  ON newest_purch.customer_id = prev_purch.customer_id
-GROUP BY newest_purch.orders_count
-ORDER BY orders_count
+      order_number,
+      sum(price) as total_sales
+    FROM kevin_ip.fld_jakepaul
+    GROUP BY order_number
+  ) fld
+  on fod.order_number = fld.order_number
+WHERE customer_id IN (
+  SELECT
+    cid
+  FROM
+  (
+    select
+      A.customer_id cid,
+      A.created_at orderdate
+    FROM
+      (SELECT customer_id, order_number, created_at
+        FROM kevin_ip.fod_jakepaul
+      ) A
+      JOIN
+      (SELECT
+        order_number,
+        sum(price) as total_sales
+        FROM kevin_ip.fld_jakepaul
+        GROUP BY order_number
+      ) B
+      on A.order_number = B.order_number
+    WHERE customer_id IS NOT NULL and customer_id != 0
+  ) data
+  GROUP BY 1
+  HAVING count(orderdate) = 5
+)
+ORDER BY 1
+;
+
+
+
+/*
+  Median time between all orders, for all order counts
+ */
+  SELECT
+    customer_id                cid,
+    created_at,
+    total_sales,
+    lag(created_at)
+    OVER (
+      PARTITION BY customer_id
+      ORDER BY created_at ) AS prev_date,
+    lag(total_sales)
+    OVER (
+      PARTITION BY customer_id
+      ORDER BY created_at ) AS prev_sales,
+    RANK()
+    OVER (
+      PARTITION BY customer_id
+      ORDER BY created_at ) AS order_rank
+  FROM
+    (
+      SELECT
+        customer_id,
+        created_at,
+        order_number
+      FROM kevin_ip.fod_jakepaul
+    ) fod
+    JOIN
+    (
+      SELECT
+        order_number,
+        sum(price) AS total_sales
+      FROM kevin_ip.fld_jakepaul
+      GROUP BY order_number
+    ) fld
+      ON fod.order_number = fld.order_number
+  WHERE customer_id IN (
+    SELECT cid
+    FROM
+      (
+        SELECT
+          A.customer_id cid,
+          A.created_at  orderdate
+        FROM
+          (SELECT
+             customer_id,
+             order_number,
+             created_at
+           FROM kevin_ip.fod_jakepaul
+          ) A
+          JOIN
+          (SELECT
+             order_number,
+             sum(price) AS total_sales
+           FROM kevin_ip.fld_jakepaul
+           GROUP BY order_number
+          ) B
+            ON A.order_number = B.order_number
+        WHERE customer_id IS NOT NULL AND customer_id != 0
+      ) data
+    GROUP BY 1
+    HAVING count(orderdate) >= 5
+  )
+  ORDER BY 1
+;
