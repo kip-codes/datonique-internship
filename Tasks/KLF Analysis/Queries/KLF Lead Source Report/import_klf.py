@@ -6,7 +6,7 @@
 # For inquiries about the file please contact the author.
 
 
-import os, boto3, psycopg2, botocore.exceptions
+import os, boto3, psycopg2
 
 
 def get_S3_Key():
@@ -51,7 +51,7 @@ def load_psql_query(s3_array):
                 DELIMITER ','
                 ACCEPTINVCHARS AS '?'
                 NULL as 'NULL'
-                REGION AS 'ap-south-1'
+                REGION AS 'us-east-2'
                 DATEFORMAT AS 'mm/dd/yy';
                 """.format(
             schematable='{}.{}'.format(schema, table),
