@@ -46,3 +46,8 @@ select *
 FROM fanjoy_customers_data
 WHERE id = 1543;
 
+SELECT *
+from fanjoy_orders_data
+order by created_at DESC
+limit 30
+;
