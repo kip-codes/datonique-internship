@@ -34,3 +34,13 @@ SELECT
 FROM klf.contacts
 WHERE date_trunc('day', date_created) = '2018-05-05'
 ;
+
+
+
+SELECT DISTINCT
+    owner_id,
+    count(owner_id)
+FROM klf.contacts
+where date_trunc('day', date_created) > '2018-05-01'
+group by 1
+order by owner_id DESC
