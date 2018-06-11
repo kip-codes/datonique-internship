@@ -66,4 +66,16 @@ where
 
 
 
+SELECT
+  *
+from klf.leads_source_report
+limit 100
+;
+
+SELECT count(date_retained)
+FROM klf.leads_source_report
+WHERE extract(year from date_created) = 2018 and extract(month from date_created) = 3
+LIMIT 100;
+
+
 select DISTINCT "where_did_you_find_us?" from klf.contacts;

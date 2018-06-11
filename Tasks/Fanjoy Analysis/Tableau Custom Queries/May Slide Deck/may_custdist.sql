@@ -42,7 +42,7 @@ FROM
         customer_id,
         order_number
       from fod_team10
-      WHERE extract(month from created_at) = 5 AND extract(year from created_at) = 2018
+      WHERE date_trunc('day', created_at) >= '2018-05-01' and date_trunc('day', created_at) <= '2018-05-29'
     ) as A
   join
     (
@@ -68,7 +68,7 @@ FROM
       order_number,
       created_at
     FROM fod_team10
-    WHERE extract(month from created_at) = 5 AND extract(year from created_at) = 2017
+    WHERE date_trunc('day', created_at) >= '2018-05-01' and date_trunc('day', created_at) <= '2018-05-29'
   ) a
   JOIN
   (
@@ -129,7 +129,7 @@ FROM
         customer_id,
         order_number
       from fod_jakepaul
-      WHERE extract(month from created_at) = 5 AND extract(year from created_at) = 2017
+      WHERE date_trunc('day', created_at) >= '2018-05-01' and date_trunc('day', created_at) <= '2018-05-29'
     ) as A
   join
     (
@@ -144,3 +144,46 @@ FROM
 ) as data
 group by 1
 order by 1;
+
+
+
+
+
+SELECT
+  sum(total_sales)
+FROM
+  (
+    select
+  A.customer_id,
+  count(B.order_number) as total_orders,
+  sum(B.total_sales) as total_sales
+  from
+    (
+      select distinct
+        customer_id,
+        order_number
+      from fod_jakepaul
+      WHERE date_trunc('day', created_at) >= '2017-05-01' and date_trunc('day', created_at) <= '2017-05-29'
+    ) as A
+  join
+    (
+      select
+        order_number,
+        sum(price) as total_sales
+      from fld_jakepaul
+    group by 1
+    ) as B
+  on A.order_number = B.order_number
+  group by 1
+  ) data
+;
+
+
+SELECT DISTINCT
+  date_trunc('day', created_at),
+  sum(total_price_usd)
+from fod_team10
+  WHERE date_trunc('day', created_at) >= '2018-05-01' and date_trunc('day', created_at) <= '2018-05-29'
+group by 1
+order by 1
+;
