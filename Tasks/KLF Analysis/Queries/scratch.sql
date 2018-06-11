@@ -73,3 +73,30 @@ from KLF.contacts
 SELECT MIN(start_time_local)
 FROM klf.invoca_call_records
 ;
+
+
+SELECT *
+from klf.leads_source_report
+order by date_created DESC
+limit 300;
+
+
+
+SELECT DISTINCT arrest_state
+FROM klf.contacts
+;
+
+
+SELECT *
+FROM klf.contacts
+LIMIT 100;
+
+
+SELECT count(*), count(date_retained)
+FROM klf.contacts
+WHERE address_billing_locality = '';
+--75840, 51
+
+select count(*), count(date_retained)
+FROM klf.contacts;
+--90984, 10416
