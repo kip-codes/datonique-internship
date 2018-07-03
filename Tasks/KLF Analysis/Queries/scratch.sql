@@ -100,3 +100,16 @@ WHERE address_billing_locality = '';
 select count(*), count(date_retained)
 FROM klf.contacts;
 --90984, 10416
+
+
+SELECT owner_id, family_name
+FROM klf.contacts
+WHERE id = 782090;
+
+
+
+
+SELECT DISTINCT date_retained
+FROM klf.contacts
+ORDER BY date_retained desc;
+

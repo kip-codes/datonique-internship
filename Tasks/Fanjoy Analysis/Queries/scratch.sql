@@ -171,3 +171,99 @@ WHERE lower(trim(C.country)) in (
 group by 1
 order by 2 desc
 ;
+
+
+
+SELECT *
+FROM kevin_ip.jpofficial_orders;
+
+SELECT created
+FROM klaviyo_orders_data
+ORDER BY created DESC
+limit 30;
+
+SELECT distinct date_trunc('day', created_at), count(*)
+FROM fanjoy_customers_data
+ORDER BY created_at DESC
+;
+
+
+SELECT max(created_at), min(created_at), count(*)
+FROM fanjoy_customers_data
+  WHERE date_trunc('day', created_at) = '2018-05'
+;
+
+
+SELECT DISTINCT date_trunc('day',created_at)
+FROM fanjoy_orders_data
+ORDER BY created_at DESC
+;
+
+SELECT count(*)
+FROM fanjoy_customers_data;
+
+
+SELECT count(*)
+FROM fanjoy_lineitems_data
+WHERE order_number IN (
+  SELECT order_number
+  FROM fanjoy_orders_data
+  WHERE date_trunc('day', created_at) <= '2018-06-27'
+        AND date_trunc('day', created_at) >= '2018-05-30'
+);
+
+
+SELECT count(*)
+FROM fanjoy_lineitems_data
+;
+
+
+SELECT order_number
+FROM fanjoy_orders_data
+GROUP BY order_number
+having count(order_number) > 1;
+
+
+SELECT *
+FROM fanjoy_customers_data
+where id in (
+'120655839240',
+'142068514824',
+'50001379336',
+'67435593736',
+'121599754248',
+'612186980461',
+'612463411309'
+)
+order by id;
+
+
+SELECT max(created_at)
+FROM fanjoy_orders_data;
+
+SELECT *
+FROM fanjoy_lineitems_data
+WHERE order_number IN
+      (
+        SELECT order_number
+        FROM fanjoy_orders_data
+        WHERE date_trunc('day', created_at) = '2018-06-29'
+      )
+;
+
+SELECT count(*)
+FROM fanjoy_customers_data
+WHERE date_trunc('day', created_at) = '2018-07-01'
+;
+
+
+SELECT count(*)
+FROM fanjoy_orders_data
+WHERE date_trunc('day', created_at) = '2018-07-01'
+;
+
+SELECT DISTINCT date_trunc('day', created_at)
+FROM fanjoy_orders_data
+WHERE date_trunc('day', created_at) > '2018-06-01'
+ORDER BY created_at
+;

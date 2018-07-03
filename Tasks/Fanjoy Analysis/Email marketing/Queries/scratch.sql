@@ -87,3 +87,6 @@ where
   total_price > 0
   and email is not NULL
 ;
+
+SELECT count(*)
+FROM edfluence_active;
