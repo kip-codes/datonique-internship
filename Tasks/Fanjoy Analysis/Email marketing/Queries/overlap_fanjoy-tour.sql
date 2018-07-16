@@ -22,7 +22,7 @@ from kevin_ip.jakepaul_tourupdates;
 
 SELECT count(*)
 FROM kevin_ip.jakepaul_tourupdates
-WHERE date_trunc('day', date::date) < '2018-06-05';
+WHERE date_trunc('day', date::date) < '2018-07-10';
 
 
 
@@ -54,7 +54,7 @@ FROM
     FROM fanjoy_orders_data
     WHERE
       total_price > 0
-      and date_trunc('day', created_at) < '2018-06-05'
+      and date_trunc('day', created_at) < '2018-07-10'
 --       and customer_email not ilike '%fanjoy.co%'
 --       AND customer_email IS NOT NULL
     GROUP BY 1
@@ -82,7 +82,7 @@ WHERE trim(lower(email)) IN
       (
         SELECT trim(lower(email))
         FROM kevin_ip.jakepaul_tourupdates
-        WHERE date_trunc('day', date::date) < '2018-06-05'
+        WHERE date_trunc('day', date::date) < '2018-07-10'
       )
 ;
 
