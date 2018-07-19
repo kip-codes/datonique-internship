@@ -9,7 +9,7 @@ from fanjoy_orders_data
 where
   total_price > 0
   and email is not NULL
-  and date_trunc('day', created_at) <= '2018-07-10'
+  and date_trunc('day', created_at) <= '2018-07-17'
 ;
 
 
@@ -52,7 +52,7 @@ FROM
     FROM fanjoy_orders_data
     WHERE
       total_price > 0
-      and date_trunc('day', created_at) < '2018-07-10'
+      and date_trunc('day', created_at) <= '2018-07-17'
     group by 1
   ) as A
   JOIN

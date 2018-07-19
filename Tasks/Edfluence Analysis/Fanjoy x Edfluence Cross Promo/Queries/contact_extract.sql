@@ -23,5 +23,5 @@ where id IN
       wp_pmpro_memberships_users
     WHERE status = 'active'
   )
-  AND date(user_registered) < '2018-07-10'
+  AND date(user_registered) <= '2018-07-17'
 ;
